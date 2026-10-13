@@ -13,7 +13,6 @@ import { heroScene } from '../game/scene.js';
 import { playBattle } from '../game/battle.js';
 import { dojoAmbience } from '../game/ambience.js';
 import { celebrate, streakFlame } from '../game/rewards.js';
-import { startAmbient } from '../game/sound.js';
 import { areaLabel, chapterLabel, areasOf } from '../topics.js';
 import { formatDuration } from '../results.js';
 
@@ -45,7 +44,7 @@ export async function render(root, params) {
   const page = h('div', { class: `game ${fx ? 'effects-on' : 'effects-off'}` });
   root.replaceChildren(page);
   if (params.section === 'progress') drawProgress(page, g, { questions, attempts, records, tests, sources, srcName, linkTo });
-  else if (dojo) { drawDojo(page, g, dojo, { srcName, linkTo, fx }); startAmbient(dojo.key); }
+  else if (dojo) drawDojo(page, g, dojo, { srcName, linkTo, fx });
   else drawCastle(page, g, { fx, catExamDate });
   setTimeout(() => { if (page.isConnected) celebrate(g); }, 700);
   return { cleanup: () => page.dispatchEvent(new Event('game-cleanup')) };

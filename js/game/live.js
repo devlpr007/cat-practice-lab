@@ -1,8 +1,8 @@
 // Premium touches (user's list, 2026-10-14): brush-stroke page changes, cards that unroll into
-// view, 3D tilt on cards, numbers that count up, phone vibration, time of day, start screen.
+// view, numbers that count up, phone vibration, time of day, start screen. (The 3D tilt and the new
+// sounds were removed at the user's request the same day.)
 // All of it runs only when the game's effects are on (body.fx-on: game on, "Reduce effects" off,
 // no reduce-motion), never on the test screen (body.in-exam). Pure presentation.
-import { sfx } from './sound.js';
 
 export const fxOn = () => document.body.classList.contains('fx-on') && !document.body.classList.contains('in-exam');
 
@@ -24,18 +24,15 @@ export function brushWipe() {
   for (let i = 0; i < 3; i++) { const s = document.createElement('span'); s.style.setProperty('--i', i); el.append(s); }
   document.body.append(el);
   wiping = el;
-  sfx.swish();
   setTimeout(() => { el.classList.add('out'); }, 230);
   setTimeout(() => { el.remove(); if (wiping === el) wiping = null; }, 620);
   return new Promise((r) => setTimeout(r, 200));
 }
 
-// ---------- 2 + 3 + 5. reveal, tilt, count-up (watched on every page) ----------
+// ---------- 2 + 5. reveal and count-up (watched on every page) ----------
 const REVEAL = '.section-card, .test-row, .card, .washi, .res-card, .res-panel, .gate, .best, .hall-badge, .advice > li, .cal-stat, .qcard, .score-table, .res-fold';
-const TILT = '.section-card, .gate, .res-card, .hall-badge, .best, .washi.framed';
 const COUNT = '.t-num, .section-count, .best-v, .res-card-value, #total-power, .gate-power strong';
 let mo = null; let io = null; let stagger = 0; let staggerTimer = 0;
-const finePointer = () => matchMedia('(hover: hover) and (pointer: fine)').matches;
 
 function startEnhancer() {
   if (mo) return;
@@ -60,7 +57,6 @@ function startEnhancer() {
       io.observe(el);
       // safety: whatever happens, a card is never left hidden
       setTimeout(() => { if (!el.classList.contains('in')) el.classList.add('in'); }, 1500);
-      if (finePointer() && el.matches(TILT)) addTilt(el);
     }
   };
   mo = new MutationObserver((list) => { for (const m of list) for (const n of m.addedNodes) take(n); });
@@ -72,20 +68,6 @@ function stopEnhancer() {
   if (mo) mo.disconnect(); if (io) io.disconnect();
   mo = null; io = null;
   for (const el of document.querySelectorAll('.reveal')) el.classList.add('in');
-}
-
-function addTilt(el) {
-  el.classList.add('tilt');
-  el.addEventListener('pointermove', (e) => {
-    if (e.pointerType !== 'mouse' || !fxOn()) return;
-    const r = el.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width - 0.5; const y = (e.clientY - r.top) / r.height - 0.5;
-    el.style.setProperty('--rx', `${(-y * 7).toFixed(2)}deg`);
-    el.style.setProperty('--ry', `${(x * 9).toFixed(2)}deg`);
-    el.style.setProperty('--gx', `${((x + 0.5) * 100).toFixed(1)}%`);
-    el.style.setProperty('--gy', `${((y + 0.5) * 100).toFixed(1)}%`);
-  });
-  el.addEventListener('pointerleave', () => { el.style.setProperty('--rx', '0deg'); el.style.setProperty('--ry', '0deg'); });
 }
 
 /** Numbers inside `el` roll up from 0 to their value (text after the number is kept). */

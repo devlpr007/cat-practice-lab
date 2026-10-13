@@ -16,7 +16,6 @@ import { victoryBanner, playBattleFor } from './dojo.js';
 import { gameState, gradeOf } from '../game/progress.js';
 import { gradeStamp, celebrate } from '../game/rewards.js';
 import { fxOn } from '../game/live.js';
-import { sfx } from '../game/sound.js';
 import { computeResult, formatDuration, TIME_GROUPS } from '../results.js';
 import { isCorrect } from '../exam/scoring.js';
 import { MISTAKE_REASONS } from '../model.js';
@@ -63,9 +62,7 @@ export async function render(root, params) {
   if (gameOn && params.battle) {
     history.replaceState(null, '', `#/result/${attempt.id}` + (params.auto ? '?auto=1' : ''));
     playBattleFor(attempt.id, gameData).then(() => {
-      // after the battle: a short melody for a good result, then any rank-up / boss defeated
-      const grade = gradeOf(computeResult(attempt, byId).overall.accuracy);
-      if (grade === 'S' || grade === 'A') sfx.melody();
+      // after the battle: any rank-up / boss defeated
       if (location.hash.startsWith(`#/result/${attempt.id}`)) celebrate(gameState(gameData));
     }).catch(() => {});
   }

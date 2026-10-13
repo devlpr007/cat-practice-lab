@@ -8,7 +8,7 @@ import { PARSER_VERSION } from '../parser/parse-pdf.js';
 import { PDFJS_VERSION } from '../parser/pdf.js';
 import { APP_VERSION } from '../version.js';
 import { showGameLink, setGameEffects } from '../main.js';
-import { setSoundOn, setAmbienceOn, sfx } from '../game/sound.js';
+import { setSoundOn, sfx } from '../game/sound.js';
 
 export async function render(root) {
   const d = await getDefaults();
@@ -57,8 +57,6 @@ export async function render(root) {
   const catDate = h('input', { type: 'date', id: 'game-cat-date', value: (await getSetting('game.catExamDate', null)) || '' });
   const soundOnBox = h('input', { type: 'checkbox', id: 'game-sound', checked: await getSetting('game.sound', gameOnByDefault()) });
   soundOnBox.addEventListener('change', async () => { await setSetting('game.sound', soundOnBox.checked); setSoundOn(soundOnBox.checked); if (soundOnBox.checked) sfx.chime(); gameSaved(soundOnBox.checked ? 'Sound on (battle and page effects only; never during a test).' : 'Sound off.'); });
-  const ambientBox = h('input', { type: 'checkbox', id: 'game-ambient', checked: await getSetting('game.ambient', gameOnByDefault()) });
-  ambientBox.addEventListener('change', async () => { await setSetting('game.ambient', ambientBox.checked); setAmbienceOn(ambientBox.checked); gameSaved(ambientBox.checked ? 'Dojo ambience on (forge, bamboo wind, crickets inside the dojos).' : 'Dojo ambience off.'); });
   const gameMsg = h('p', { role: 'status', class: 'small' });
   const gameSaved = (text) => { gameMsg.className = 'ok small'; gameMsg.textContent = text; };
   const syncFx = () => setGameEffects(gameOn.checked && !fxOff.checked && !matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -78,8 +76,7 @@ export async function render(root) {
       h('p', { class: 'muted small' }, 'A game layer over your practice: castle, three dojos, ranks, topic bosses and Shadow Scrolls, all worked out from your saved tests (nothing extra is stored). The test screen always stays plain.'),
       h('label', { class: 'check' }, gameOn, ' Show the samurai game'),
       h('label', { class: 'check' }, fxOff, ' Reduce effects (no petals, movement, transitions, animations or vibration)'),
-      h('label', { class: 'check' }, soundOnBox, ' Sound (battles, rank-ups, page changes and soft button sounds; never during a test)'),
-      h('label', { class: 'check' }, ambientBox, ' Dojo ambience (background sound inside each dojo; needs Sound on)'),
+      h('label', { class: 'check' }, soundOnBox, ' Sound (short synthesised effects in battles and transitions; never during a test)'),
       h('label', { class: 'field' }, h('span', null, 'CAT exam date (for the final-boss countdown)'), catDate),
       gameMsg),
     h('section', { class: 'card' },

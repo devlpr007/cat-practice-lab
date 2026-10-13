@@ -5,7 +5,6 @@
 // current state, so nothing old is replayed. Never on the test screen.
 import { h } from '../ui.js';
 import { getSetting, setSetting } from '../db.js';
-import { sfx } from './sound.js';
 import { fxOn, haptic } from './live.js';
 import { DOJOS } from './progress.js';
 
@@ -47,7 +46,7 @@ function overlay(cls, children, ms) {
   });
 }
 
-/** 6: rank-up — the emblem rises, a gong, a burst of petals. */
+/** 6: rank-up — the emblem rises with a burst of petals. */
 async function rankCeremony(rank) {
   const fx = fxOn();
   const petals = h('canvas', { class: 'cer-petals', 'aria-hidden': 'true' });
@@ -57,7 +56,6 @@ async function rankCeremony(rank) {
     h('p', { class: 'cer-kicker' }, 'New rank'),
     h('h2', { class: 'cer-title', id: 'rank-up-title' }, `You are now ${/^[AEIOU]/.test(rank.name) ? 'an' : 'a'} ${rank.name}`),
   ], 6500);
-  sfx.gong();
   haptic([40, 60, 120]);
   if (fx) petalBurst(petals);
   return p;
@@ -75,8 +73,7 @@ async function bossCutIn(node) {
     h('h2', { class: 'cer-title' }, node.chapter || 'A sub-topic'),
     h('p', { class: 'cer-sub small' }, `${DOJOS.find((d) => d.subject === node.subject)?.name || ''} · mastered: ${node.accuracy}% in your last tests`),
   ], 4500);
-  setTimeout(() => { sfx.slash(); haptic([30, 40, 30]); }, 450);
-  setTimeout(() => sfx.stamp(), 1100);
+  setTimeout(() => haptic([30, 40, 30]), 450);
   return p;
 }
 
@@ -114,7 +111,7 @@ export function gradeStamp(grade, { animate }) {
   const el = h('div', { class: `grade-stamp g-${grade}${animate ? ' stamping' : ''}`, id: 'grade-stamp', role: 'img', 'aria-label': `Grade ${grade}` },
     h('span', { class: 'gs-letter' }, grade), h('span', { class: 'gs-word' }, grade === 'S' ? 'Flawless' : grade === 'A' ? 'Victory' : 'Fought'));
   if (animate) {
-    setTimeout(() => { sfx.stamp(); haptic(25); }, 380);
+    setTimeout(() => haptic(25), 380);
   }
   return el;
 }

@@ -15,7 +15,7 @@ export async function render(root) {
         h('li', null, 'The app has no server and no database of its own. Your data is kept on your device and, only if you sign in, in your own Google Drive.'),
         h('li', null, 'The app\'s maker cannot see your PDFs, questions, answers or results.'),
         h('li', null, 'No advertising, no analytics, no tracking, and the app sets no cookies.'),
-        h('li', null, 'The app contains no institute material. Add only PDFs you have the right to use.'))),
+        h('li', null, 'The app contains no institute material. Add only PDFs you have the right to use. Questions, solutions and answer keys in the PDFs you add remain the property of their publishers; the app is not affiliated with them.'))),
     sec('Where the app comes from',
       h('p', null, 'The app\'s files (its code, pictures and fonts) are hosted on GitHub Pages, a service of GitHub, Inc. When your browser downloads them, GitHub receives the usual technical details of any web visit (such as your IP address and browser type), as described in GitHub\'s own privacy statement. None of your study data is ever sent to GitHub.'),
       h('p', null, 'After the first visit the app keeps its files on your device, so it also starts without internet.')),

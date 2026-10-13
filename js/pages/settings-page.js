@@ -1,5 +1,6 @@
 // Settings: default time limit and marks for new tests, storage status, versions.
 import { h, formatBytes } from '../ui.js';
+import { gameOnByDefault } from '../game/defaults.js';
 import { getDefaults, saveDefaults } from '../settings.js';
 import { storageStatus, requestPersistentStorage, getSetting, setSetting, saveDemo, getTest } from '../db.js';
 import { buildDemoVarc, DEMO_TEST_ID } from '../demo.js';
@@ -51,10 +52,10 @@ export async function render(root) {
   const dirMsg = h('p', { role: 'status', class: 'small' });
   dirSel.addEventListener('change', async () => { await setSetting('timerDirection', dirSel.value); dirMsg.className = 'ok small'; dirMsg.textContent = 'Saved.'; });
   const demoMsg = h('p', { role: 'status', class: 'small' });
-  const gameOn = h('input', { type: 'checkbox', id: 'game-enabled', checked: await getSetting('game.enabled', false) });
+  const gameOn = h('input', { type: 'checkbox', id: 'game-enabled', checked: await getSetting('game.enabled', gameOnByDefault()) });
   const fxOff = h('input', { type: 'checkbox', id: 'game-reduce-effects', checked: await getSetting('game.reduceEffects', false) });
   const catDate = h('input', { type: 'date', id: 'game-cat-date', value: (await getSetting('game.catExamDate', null)) || '' });
-  const soundOnBox = h('input', { type: 'checkbox', id: 'game-sound', checked: await getSetting('game.sound', false) });
+  const soundOnBox = h('input', { type: 'checkbox', id: 'game-sound', checked: await getSetting('game.sound', gameOnByDefault()) });
   soundOnBox.addEventListener('change', async () => { await setSetting('game.sound', soundOnBox.checked); setSoundOn(soundOnBox.checked); if (soundOnBox.checked) sfx.chime(); gameSaved(soundOnBox.checked ? 'Sound on (battle and page effects only; never during a test).' : 'Sound off.'); });
   const gameMsg = h('p', { role: 'status', class: 'small' });
   const gameSaved = (text) => { gameMsg.className = 'ok small'; gameMsg.textContent = text; };

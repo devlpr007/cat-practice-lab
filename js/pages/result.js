@@ -2,6 +2,7 @@
 // Layout follows the user's reference pictures; only real data is shown (no percentile, no
 // difficulty levels — the PDFs do not provide them).
 import { h, fill, UrlBag, showPicture, formatDate } from '../ui.js';
+import { gameOnByDefault } from '../game/defaults.js';
 import {
   getAttempt, getTest, getQuestions, getImagesForSources, getQuestionAttempts, updateQuestionAttempt,
   updateQuestionSubTopic, updateQuestionTopic, listQuestions, listAllAttempts, listAllQuestionAttempts, listSources, listTests, getSetting,
@@ -50,7 +51,7 @@ export async function render(root, params) {
     return el;
   };
 
-  const gameOn = await getSetting('game.enabled', false);
+  const gameOn = await getSetting('game.enabled', gameOnByDefault());
   const gameData = gameOn ? { questions: await listQuestions(), attempts: await listAllAttempts(), records: await listAllQuestionAttempts(), tests: await listTests() } : null;
   const victory = gameOn ? await victoryBanner(attempt.id, gameData) : null;
   // the battle scene plays once, right after a submit (never during the test); "Replay battle" shows it again

@@ -1,5 +1,6 @@
 // App start-up and page switching (#/library, #/add, #/test/<id>, #/settings, #/sectional, ...).
 import { h } from './ui.js';
+import { gameOnByDefault } from './game/defaults.js';
 import { openDb, requestPersistentStorage, fillMissingTopics, getSetting } from './db.js';
 import { openActiveDatabase } from './sync/account.js';
 
@@ -104,8 +105,8 @@ window.addEventListener('beforeunload', (e) => {
     return;
   }
   try { await fillMissingTopics(); } catch (err) { console.error(err); }
-  showGameLink(await getSetting('game.enabled', false));
-  setGameEffects((await getSetting('game.enabled', false)) && !(await getSetting('game.reduceEffects', false)) && !matchMedia('(prefers-reduced-motion: reduce)').matches);
+  showGameLink(await getSetting('game.enabled', gameOnByDefault()));
+  setGameEffects((await getSetting('game.enabled', gameOnByDefault())) && !(await getSetting('game.reduceEffects', false)) && !matchMedia('(prefers-reduced-motion: reduce)').matches);
   requestPersistentStorage();
   route();
   registerOffline();

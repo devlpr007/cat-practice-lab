@@ -3,6 +3,7 @@
 // game choices are settings (CAT date, reduce effects), which the backup includes.
 // The test screen itself is never themed.
 import { h, fill, formatDate } from '../ui.js';
+import { gameOnByDefault } from '../game/defaults.js';
 import { listQuestions, listAllAttempts, listAllQuestionAttempts, listTests, listSources, getSetting, setSetting } from '../db.js';
 import { gameState, DOJOS, POWER, MASTERY_ACCURACY, MASTERY_TESTS, BOSS_RETURN_DAYS, RANKS } from '../game/progress.js';
 import { dojoEmblem, bossMask } from '../game/art.js';
@@ -22,7 +23,7 @@ export async function effectsOn() {
 }
 
 export async function render(root, params) {
-  const enabled = await getSetting('game.enabled', false);
+  const enabled = await getSetting('game.enabled', gameOnByDefault());
   if (!enabled) {
     root.replaceChildren(h('div', { class: 'page narrow' }, h('h1', null, 'Dojo'),
       h('div', { class: 'box' }, 'The samurai game is switched off. ', h('a', { href: '#/settings' }, 'Turn it on in Settings'), '.')));
@@ -247,7 +248,7 @@ function battleFor(attemptId, { questions, attempts, records, tests }) {
 
 /** Play the battle scene for a submitted attempt (results page only). Resolves when closed. */
 export async function playBattleFor(attemptId, data) {
-  if (!(await getSetting('game.enabled', false))) return;
+  if (!(await getSetting('game.enabled', gameOnByDefault()))) return;
   const info = battleFor(attemptId, data);
   if (!info) return;
   const fx = await effectsOn();
@@ -257,7 +258,7 @@ export async function playBattleFor(attemptId, data) {
 
 /** Victory banner for the results page (only when the game is on). */
 export async function victoryBanner(attemptId, data) {
-  if (!(await getSetting('game.enabled', false))) return null;
+  if (!(await getSetting('game.enabled', gameOnByDefault()))) return null;
   const info = battleFor(attemptId, data);
   if (!info) return null;
   const { battle: b, dojo: d } = info;

@@ -1,13 +1,14 @@
-// Stage 6e: optional sound, OFF by default (Settings → Samurai game → Sound). All sounds are
+// Stage 6e: sound, ON by default for a new user (Settings → Samurai game → Sound switches it off). All sounds are
 // synthesised here with the Web Audio API (no audio files, nothing downloaded): a soft ink
 // "whoosh", a blade slash, a hit thud, a paper chime for the final card, and a gong for a rank-up.
 import { getSetting } from '../db.js';
+import { gameOnByDefault } from './defaults.js';
 
 let ctx = null;
 let enabled = null;
 
 export async function soundOn() {
-  if (enabled === null) enabled = await getSetting('game.sound', false);
+  if (enabled === null) enabled = await getSetting('game.sound', gameOnByDefault());
   return enabled;
 }
 export function setSoundOn(on) { enabled = !!on; }

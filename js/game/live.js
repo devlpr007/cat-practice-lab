@@ -43,7 +43,7 @@ function startEnhancer() {
       const el = e.target;
       const delay = Math.min(stagger++, 8) * 55;
       clearTimeout(staggerTimer); staggerTimer = setTimeout(() => { stagger = 0; }, 400);
-      setTimeout(() => { el.classList.add('in'); if (el.matches(COUNT) || el.querySelector(COUNT)) countUpIn(el); }, delay);
+      setTimeout(() => { el.classList.add('in'); if (el.matches(COUNT) || el.querySelector(COUNT)) countUpIn(el); settle(el); }, delay);
     }
   }, { threshold: 0.08 });
   const take = (node) => {
@@ -56,7 +56,7 @@ function startEnhancer() {
       el.classList.add('reveal');
       io.observe(el);
       // safety: whatever happens, a card is never left hidden
-      setTimeout(() => { if (!el.classList.contains('in')) el.classList.add('in'); }, 1500);
+      setTimeout(() => { if (!el.classList.contains('in')) { el.classList.add('in'); settle(el); } }, 1500);
     }
   };
   mo = new MutationObserver((list) => { for (const m of list) for (const n of m.addedNodes) take(n); });
@@ -64,6 +64,9 @@ function startEnhancer() {
   mo.observe(root, { childList: true, subtree: true });
   take(root);
 }
+/** Once a card has unrolled, give it back its own style (so its hover lift and shadows work). */
+function settle(el) { setTimeout(() => el.classList.remove('reveal', 'in'), 700); }
+
 function stopEnhancer() {
   if (mo) mo.disconnect(); if (io) io.disconnect();
   mo = null; io = null;

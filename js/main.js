@@ -3,6 +3,8 @@ import { h } from './ui.js';
 import { gameOnByDefault } from './game/defaults.js';
 import { openDb, requestPersistentStorage, fillMissingTopics, getSetting } from './db.js';
 import { openActiveDatabase } from './sync/account.js';
+import { setFx, brushWipe, applyDayPhase, startScreen } from './game/live.js';
+import { sfx, stopAmbient } from './game/sound.js';
 
 const pages = {
   library: () => import('./pages/library.js'),
@@ -42,7 +44,7 @@ function parseHash(hash = location.hash) {
 let pending = false;
 /** Whether game effects are on (set at start-up and when Settings changes it). */
 let gameEffects = false;
-export function setGameEffects(on) { gameEffects = !!on; }
+export function setGameEffects(on) { gameEffects = !!on; setFx(gameEffects); }
 
 async function route() {
   // a page change requested while another page is still loading is done right after it
@@ -59,10 +61,13 @@ async function route() {
     const { name, params } = parseHash();
     // game pages: ink-cloud transition (with the dojo's medallion when entering a dojo); never on the test screen
     const prev = currentHash ? parseHash(currentHash) : null;
+    stopAmbient(); // a dojo's background sound stops when its page is left
     if (name === 'dojo' && gameEffects && !document.body.classList.contains('in-exam') && currentHash !== null) {
       const { inkTransition } = await import('./game/transition.js');
       const dojoKey = ['quant', 'varc', 'lrdi'].includes(params.section) && prev?.params?.section !== params.section ? params.section : null;
       await inkTransition({ dojoKey });
+    } else if (gameEffects && currentHash !== null && name !== 'exam' && prev?.name !== 'exam' && !document.body.classList.contains('in-exam')) {
+      await brushWipe(); // other pages: a quick ink brush stroke (never into or out of a test)
     }
     if (current && current.cleanup) current.cleanup();
     current = null;
@@ -108,9 +113,23 @@ window.addEventListener('beforeunload', (e) => {
   showGameLink(await getSetting('game.enabled', gameOnByDefault()));
   setGameEffects((await getSetting('game.enabled', gameOnByDefault())) && !(await getSetting('game.reduceEffects', false)) && !matchMedia('(prefers-reduced-motion: reduce)').matches);
   requestPersistentStorage();
+  applyDayPhase();
+  setInterval(applyDayPhase, 10 * 60_000);
+  if (gameEffects) startScreen();
   route();
   registerOffline();
 })();
+
+// quiet interface sounds with the game on (never on the test screen; the Sound switch turns them off)
+const uiSoundsHere = () => document.body.classList.contains('themed') && !document.body.classList.contains('in-exam') && !document.body.classList.contains('battle-open');
+document.addEventListener('click', (e) => {
+  if (!uiSoundsHere()) return;
+  const t = e.target.closest('button, a[href], summary, .section-card, .gate');
+  if (!t || t.closest('.exam')) return;
+  if (t.matches('summary')) return; // the "toggle" sound below
+  sfx.tok();
+}, true);
+document.addEventListener('toggle', (e) => { if (uiSoundsHere() && e.target.matches?.('details')) sfx.rustle(); }, true);
 
 
 /** The samurai game (Stage 6) adds a "Dojo" link to the top bar only when it is switched on. */

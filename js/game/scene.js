@@ -55,7 +55,44 @@ export function heroScene({ fx, glow }) {
   let visible = true;
   const cleanups = [];
 
+  // ---- time of day: a tint over the night scene (dawn rose, day haze, dusk amber; night as painted) ----
+  const tint = document.createElement('div');
+  tint.className = 'layer l-tint';
+  tint.setAttribute('aria-hidden', 'true');
+  el.insertBefore(tint, branch);
+
   if (fx) {
+    // ---- living sky: clouds drifting past the moon, and now and then birds crossing ----
+    const clouds = document.createElement('div');
+    clouds.className = 'layer l-clouds';
+    clouds.setAttribute('aria-hidden', 'true');
+    for (let i = 0; i < 4; i++) {
+      const c = document.createElement('span');
+      c.className = 'cloud';
+      c.style.setProperty('--y', `${6 + i * 9}%`);
+      c.style.setProperty('--d', `${70 + i * 23}s`);
+      c.style.setProperty('--delay', `${-i * 19}s`);
+      c.style.setProperty('--s', (0.7 + (i % 3) * 0.25).toFixed(2));
+      clouds.append(c);
+    }
+    el.insertBefore(clouds, far);
+    const birds = document.createElement('div');
+    birds.className = 'layer l-birds';
+    birds.setAttribute('aria-hidden', 'true');
+    el.insertBefore(birds, far);
+    const flight = () => {
+      if (!el.isConnected) return;
+      const flock = document.createElement('span');
+      flock.className = 'flock';
+      flock.style.setProperty('--y', `${8 + Math.random() * 22}%`);
+      flock.style.setProperty('--dir', Math.random() < 0.5 ? '1' : '-1');
+      flock.innerHTML = '<svg viewBox="0 0 60 24" width="60" height="24"><path d="M2 12 Q8 4 14 11 Q20 4 26 12" /><path d="M30 8 Q35 2 40 7 Q45 2 50 8" /><path d="M20 20 Q24 15 28 19 Q32 15 36 20" /></svg>';
+      birds.append(flock);
+      setTimeout(() => flock.remove(), 16000);
+    };
+    timers.push(setTimeout(flight, 3000));
+    timers.push(setInterval(flight, 26000));
+
     // ---- mist (canvas, low resolution, drifting soft blobs) ----
     const mist = document.createElement('canvas');
     mist.className = 'layer l-mist';
@@ -213,7 +250,7 @@ export function heroScene({ fx, glow }) {
     }
   }
 
-  const destroy = () => { for (const c of cleanups) c(); timers.forEach(clearInterval); };
+  const destroy = () => { for (const c of cleanups) c(); timers.forEach((t) => { clearInterval(t); clearTimeout(t); }); };
   return { el, destroy };
 }
 

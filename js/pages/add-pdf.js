@@ -17,6 +17,13 @@ import { formatBytes } from '../ui.js';
 import { areasOf, chaptersOf, classifyTopic, AREA_LONG } from '../topics.js';
 import { detectPdfFormat, parseMock } from '../parser/parse-mock.js';
 import { renderMockReview } from './add-mock.js';
+import { fxOn } from '../game/live.js';
+
+/** While PDFs are read (game effects on): a samurai sharpening his blade, sparks flying. */
+const sharpening = () => (fxOn() ? h('div', { class: 'sharpening', 'aria-hidden': 'true' },
+  h('img', { src: 'assets/theme/samurai_idle.webp', alt: '', class: 'sh-samurai', draggable: false }),
+  h('span', { class: 'sh-stone' }), h('span', { class: 'sh-glint' }),
+  ...[0, 1, 2, 3, 4, 5].map((i) => h('span', { class: 'sh-spark', style: { '--i': i } }))) : null);
 
 export async function render(root) {
   const bag = new UrlBag();
@@ -63,6 +70,7 @@ export async function render(root) {
     root.replaceChildren(h('div', { class: 'page narrow' },
       h('h1', null, 'Reading the PDF'),
       h('p', null, file.name),
+      sharpening(),
       status, bar, elapsed,
       h('p', { class: 'muted small' }, 'This usually takes 10–60 seconds. Please keep this page open.')));
     try {
@@ -120,6 +128,7 @@ export async function render(root) {
     const stopBtn = h('button', { class: 'btn', type: 'button', onClick: () => { stop = true; stopBtn.disabled = true; stopBtn.textContent = 'Stopping after this file…'; } }, 'Stop after this file');
     root.replaceChildren(h('div', { class: 'page narrow' },
       h('h1', null, `Reading ${files.length} PDFs`),
+      sharpening(),
       h('p', { class: 'muted small' }, 'Please keep this page open. Each PDF takes about 10–60 seconds. PDFs that read cleanly are saved as you wait; the doubtful ones are shown to you afterwards, one by one.'),
       status, fileBar, overall, h('p', null, stopBtn), listEl));
 

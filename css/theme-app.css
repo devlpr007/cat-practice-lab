@@ -96,3 +96,6 @@ body.themed:not(.in-exam) .acc > summary { background: #1e2140; color: var(--t-g
 body.themed:not(.in-exam) .res-wrap .muted, body.themed:not(.in-exam) .res-fold .muted, body.themed:not(.in-exam) .res-card .muted, body.themed:not(.in-exam) .res-fold p.small { color: var(--t-paper-muted); }
 body.themed:not(.in-exam) .res-wrap > .muted.small { color: #d8d2c0; }
 body.themed:not(.in-exam) .time-grid th { background: rgba(43, 36, 25, 0.08); }
+
+/* small notes on the light result cards stay readable */
+body.themed:not(.in-exam) .res-card .muted { color: #6b6150; }

@@ -13,6 +13,10 @@ import { areasOf, chaptersOf, AREA_LONG } from '../topics.js';
 import { buildFeedback } from '../feedback.js';
 import { askAiMessage, combinedPicture } from '../ask-ai.js';
 import { victoryBanner, playBattleFor } from './dojo.js';
+import { gameState, gradeOf } from '../game/progress.js';
+import { gradeStamp, celebrate } from '../game/rewards.js';
+import { fxOn } from '../game/live.js';
+import { sfx } from '../game/sound.js';
 import { computeResult, formatDuration, TIME_GROUPS } from '../results.js';
 import { isCorrect } from '../exam/scoring.js';
 import { MISTAKE_REASONS } from '../model.js';
@@ -55,10 +59,24 @@ export async function render(root, params) {
   const gameData = gameOn ? { questions: await listQuestions(), attempts: await listAllAttempts(), records: await listAllQuestionAttempts(), tests: await listTests() } : null;
   const victory = gameOn ? await victoryBanner(attempt.id, gameData) : null;
   // the battle scene plays once, right after a submit (never during the test); "Replay battle" shows it again
+  const justSubmitted = !!params.battle;
   if (gameOn && params.battle) {
     history.replaceState(null, '', `#/result/${attempt.id}` + (params.auto ? '?auto=1' : ''));
-    playBattleFor(attempt.id, gameData);
+    playBattleFor(attempt.id, gameData).then(() => {
+      // after the battle: a short melody for a good result, then any rank-up / boss defeated
+      const grade = gradeOf(computeResult(attempt, byId).overall.accuracy);
+      if (grade === 'S' || grade === 'A') sfx.melody();
+      if (location.hash.startsWith(`#/result/${attempt.id}`)) celebrate(gameState(gameData));
+    }).catch(() => {});
   }
+  let stampShown = false; // the seal stamps once per visit (first time the scorecard is shown)
+  const stamp = () => {
+    if (!gameOn) return null;
+    const grade = gradeOf(result.overall.accuracy);
+    const animate = fxOn() && !stampShown;
+    stampShown = true;
+    return gradeStamp(grade, { animate });
+  };
 
   let tab = params.tab || 'performance';
   let current = Number(params.q || 1) - 1;
@@ -107,7 +125,7 @@ export async function render(root, params) {
     fill(content, h('div', { class: 'res-wrap' },
       params.auto ? h('div', { class: 'box box-warn', role: 'status', id: 'submitted' }, 'Time is up — your test was submitted automatically.') : h('div', { class: 'visually-hidden', id: 'submitted' }, 'Test submitted'),
       victory,
-      h('h2', { class: 'res-title' }, `${attempt.snapshot.name} — Scorecard`),
+      h('div', { class: 'res-title-row' }, h('h2', { class: 'res-title' }, `${attempt.snapshot.name} — Scorecard`), stamp()),
       h('p', { class: 'muted small' },
         `Submitted ${formatDate(new Date(attempt.submittedAt).toISOString())}${attempt.autoSubmitted ? ' (time ran out)' : ''} · `,
         `time used ${formatDuration(attempt.submittedAt - attempt.startedAt)} of ${formatDuration(attempt.durationMs)}`,
@@ -134,7 +152,7 @@ export async function render(root, params) {
     fill(content, h('div', { class: 'res-wrap' },
       params.auto ? h('div', { class: 'box box-warn', role: 'status', id: 'submitted' }, 'Time is up — your mock was submitted automatically.') : h('div', { class: 'visually-hidden', id: 'submitted' }, 'Test submitted'),
       victory,
-      h('h2', { class: 'res-title' }, `${attempt.snapshot.name} — Scorecard`),
+      h('div', { class: 'res-title-row' }, h('h2', { class: 'res-title' }, `${attempt.snapshot.name} — Scorecard`), stamp()),
       h('p', { class: 'muted small' }, `Submitted ${formatDate(new Date(attempt.submittedAt).toISOString())} · time used ${formatDuration(usedTotal)} of ${formatDuration(allotted)} · three sections in fixed order, each with its own clock`),
       table(['Section', 'Questions', 'Attempted', 'Correct', 'Incorrect', 'Skipped', 'Attempt rate', 'Accuracy', 'Negative', 'Time used', 'Score'],
         [[o.name, o.questions, o.attempted, o.correct, o.incorrect, o.skipped, pctOr(Math.round((o.attempted / o.questions) * 1000) / 10), pctOr(o.accuracy), fmtNum(o.negativeMarks), formatDuration(usedTotal), h('strong', null, `${fmtNum(o.score)} / ${fmtNum(o.maxScore)}`)],

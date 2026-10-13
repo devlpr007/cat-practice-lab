@@ -20,7 +20,7 @@ export const MUTABLE = {
   tests: ['settings'],
 };
 /** Settings that stay on one device (never synced). */
-export const DEVICE_SETTINGS = new Set(['lastBackupAt', 'lastBackupInfo', 'game.reduceEffects', 'game.sound', 'firstRunSeen']);
+export const DEVICE_SETTINGS = new Set(['lastBackupAt', 'lastBackupInfo', 'game.reduceEffects', 'game.sound', 'game.ambient', 'game.rankShown', 'game.bossesShown', 'firstRunSeen']);
 export const isDeviceSetting = (key) => DEVICE_SETTINGS.has(key) || String(key).startsWith('sync.');
 /** How long a value replaced by another device's newer change is remembered. */
 export const KEEP_REPLACED_MS = 30 * 24 * 3600 * 1000;

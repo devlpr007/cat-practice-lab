@@ -12,6 +12,8 @@ import { buildFeedback } from '../feedback.js';
 import { heroScene } from '../game/scene.js';
 import { playBattle } from '../game/battle.js';
 import { dojoAmbience } from '../game/ambience.js';
+import { celebrate, streakFlame } from '../game/rewards.js';
+import { startAmbient } from '../game/sound.js';
 import { areaLabel, chapterLabel, areasOf } from '../topics.js';
 import { formatDuration } from '../results.js';
 
@@ -43,8 +45,9 @@ export async function render(root, params) {
   const page = h('div', { class: `game ${fx ? 'effects-on' : 'effects-off'}` });
   root.replaceChildren(page);
   if (params.section === 'progress') drawProgress(page, g, { questions, attempts, records, tests, sources, srcName, linkTo });
-  else if (dojo) drawDojo(page, g, dojo, { srcName, linkTo, fx });
+  else if (dojo) { drawDojo(page, g, dojo, { srcName, linkTo, fx }); startAmbient(dojo.key); }
   else drawCastle(page, g, { fx, catExamDate });
+  setTimeout(() => { if (page.isConnected) celebrate(g); }, 700);
   return { cleanup: () => page.dispatchEvent(new Event('game-cleanup')) };
 }
 
@@ -58,6 +61,8 @@ const GLOW = {
   windows: [{ x: 0.332, y: 0.247 }, { x: 0.367, y: 0.329 }, { x: 0.405, y: 0.334 }, { x: 0.371, y: 0.423 }, { x: 0.591, y: 0.500 }, { x: 0.541, y: 0.517 }],
 };
 const ICON = (name) => `assets/theme/icons/${name}.webp`;
+/** Page backdrop for CSS: a full address (a relative one would be read from the css/ folder). */
+const backdrop = (name) => `url("${new URL(`assets/theme/${name}.webp`, document.baseURI).href}")`;
 const RANK_ICON = ['rank1_ashigaru', 'rank2_samurai', 'rank3_hatamoto', 'rank4_daimyo', 'rank5_shogun'];
 const DOJO_ICON = { quant: 'dojo_blade', varc: 'dojo_scroll', lrdi: 'dojo_shadow' };
 const DOJO_ART = { quant: 'dojo_blade_header', varc: 'dojo_scroll_header', lrdi: 'dojo_shadow_header' };
@@ -78,7 +83,8 @@ function drawCastle(page, g, { fx, catExamDate }) {
       h('h1', { id: 'rank-title' }, g.rank.name),
       h('p', { class: 'power', id: 'total-power' }, `${g.power} power`),
       bar(g.rank.progress, 'rank-bar'),
-      h('p', { class: 'next' }, g.rank.next ? `${g.rank.toNext} more power to ${g.rank.next.name}` : 'The highest rank. The final boss awaits.')),
+      h('p', { class: 'next' }, g.rank.next ? `${g.rank.toNext} more power to ${g.rank.next.name}` : 'The highest rank. The final boss awaits.'),
+      streakFlame(g.streak)),
     pic(ICON(RANK_ICON[g.rank.index]), 'rank-emblem', `${g.rank.name} emblem`));
   const heroWrap = h('div', { class: 'hero-wrap' }, scene.el, rankCard);
 
@@ -122,7 +128,7 @@ function drawCastle(page, g, { fx, catExamDate }) {
           h('li', null, `Bosses defeated: ${b.bossesDefeated} · Shadow Scrolls cleared: ${b.scrollsCleared}`)),
         h('a', { class: 't-btn', href: '#/dojo/progress', id: 'open-progress' }, 'Progress, charts and the hall of badges ›'))));
 
-  document.body.style.setProperty('--page-backdrop', 'url(assets/theme/home_sky.webp)');
+  document.body.style.setProperty('--page-backdrop', backdrop('home_sky'));
   fill(page,
     heroWrap,
     h('div', { class: 'inner' },
@@ -148,7 +154,7 @@ const MINIBOSS_NAME = { quant: 'the Iron General', varc: 'the Ink Sage', lrdi: '
 function drawDojo(page, g, dojo, { srcName, linkTo, fx }) {
   document.body.classList.add('dojo-page');
   page.classList.add(`dojo-${dojo.key}`);
-  document.body.style.setProperty('--page-backdrop', `url(assets/theme/${DOJO_ART[dojo.key]}.webp)`);
+  document.body.style.setProperty('--page-backdrop', backdrop(DOJO_ART[dojo.key]));
   let stopAmbience = null;
   page.addEventListener('game-cleanup', () => { document.body.classList.remove('dojo-page'); document.body.style.removeProperty('--page-backdrop'); if (stopAmbience) stopAmbience(); }, { once: true });
   const d = g.dojos.find((x) => x.key === dojo.key);
@@ -289,7 +295,7 @@ function calendarStats(g) {
 
 function drawProgress(page, g, { questions, attempts, records, tests, sources, srcName, linkTo }) {
   document.body.classList.add('dojo-page');
-  document.body.style.setProperty('--page-backdrop', 'url(assets/theme/home_sky.webp)');
+  document.body.style.setProperty('--page-backdrop', backdrop('home_sky'));
   page.addEventListener('game-cleanup', () => { document.body.classList.remove('dojo-page'); document.body.style.removeProperty('--page-backdrop'); }, { once: true });
   const fb = buildFeedback({ questions, attempts, records, sources, tests });
   const b = g.best;

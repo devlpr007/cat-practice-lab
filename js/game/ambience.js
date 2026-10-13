@@ -1,5 +1,5 @@
 // Stage 6e: ambient effects drawn in code inside each dojo's header scene only (never over the
-// cards): forge sparks (Blade), drifting ink fog from both sides (Scroll), fireflies (Shadow).
+// cards): forge sparks (Blade), ink fog rolling in from both sides (Scroll), fireflies (Shadow).
 // Runs only with effects on; stops when the scene is scrolled away or the tab is hidden.
 const rnd = (a, b) => a + Math.random() * (b - a);
 
@@ -21,7 +21,7 @@ export function dojoAmbience(scene, key) {
     W = Math.max(1, Math.round(r.width * scale)); H = Math.max(1, Math.round(r.height * scale));
     canvas.width = W; canvas.height = H;
     P.length = 0;
-    const n = { quant: W < 500 ? 40 : 70, varc: 12, lrdi: W < 500 ? 18 : 34 }[key];
+    const n = { quant: W < 500 ? 40 : 70, varc: W < 300 ? 18 : 30, lrdi: W < 500 ? 18 : 34 }[key];
     for (let i = 0; i < n; i++) P.push(spawn(key, W, H, true));
   };
   const ro = new ResizeObserver(size);
@@ -46,19 +46,33 @@ export function dojoAmbience(scene, key) {
       g.globalAlpha = 1;
     },
     varc(dt, t) {
+      // rolling ink fog: stretched wisps that clearly drift in from both sides, rise a little,
+      // sway, swell and thin out, and dissolve before they reach the middle
       g.clearRect(0, 0, W, H);
       g.globalCompositeOperation = 'lighter';
       for (const p of P) {
-        p.x += p.vx * dt; p.y += Math.sin(t * 0.25 + p.ph) * 6 * dt;
-        // fog drifts in from its side across the scene and fades as it reaches the middle
-        const inward = p.side < 0 ? p.x / W : 1 - p.x / W; // 0 at own edge, 0.5 at the centre
-        if (inward > 0.62) Object.assign(p, spawn(key, W, H, false));
-        const fade = Math.max(0, 1 - inward / 0.62);
-        const grad = g.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
-        grad.addColorStop(0, `rgba(235, 238, 230, ${(p.alpha * fade).toFixed(3)})`);
-        grad.addColorStop(1, 'rgba(235, 238, 230, 0)');
+        p.age += dt;
+        p.x += p.vx * dt;
+        p.y += (p.vy + Math.sin(t * 0.6 + p.ph) * 9) * dt;
+        p.rot += p.spin * dt;
+        const inward = p.side < 0 ? p.x / W : 1 - p.x / W; // 0 at its own edge, 0.5 in the middle
+        if (inward > 0.58 || p.y < -p.r) Object.assign(p, spawn(key, W, H, false));
+        const fadeIn = Math.min(1, p.age / 1.6);
+        const fadeOut = Math.max(0, 1 - Math.max(0, inward - 0.2) / 0.38);
+        const breathe = 0.75 + 0.25 * Math.sin(t * 0.9 + p.ph * 2);
+        const a = p.alpha * fadeIn * fadeOut * breathe;
+        if (a < 0.003) continue;
+        g.save();
+        g.translate(p.x, p.y);
+        g.rotate(p.rot);
+        g.scale(p.stretch, 1);
+        const grad = g.createRadialGradient(0, 0, 0, 0, 0, p.r);
+        grad.addColorStop(0, `rgba(236, 240, 232, ${a.toFixed(3)})`);
+        grad.addColorStop(0.45, `rgba(236, 240, 232, ${(a * 0.55).toFixed(3)})`);
+        grad.addColorStop(1, 'rgba(236, 240, 232, 0)');
         g.fillStyle = grad;
-        g.fillRect(p.x - p.r, p.y - p.r, 2 * p.r, 2 * p.r);
+        g.beginPath(); g.arc(0, 0, p.r, 0, Math.PI * 2); g.fill();
+        g.restore();
       }
     },
     lrdi(dt, t) {
@@ -107,8 +121,14 @@ function spawn(key, W, H, anywhere) {
   }
   if (key === 'varc') {
     const side = Math.random() < 0.5 ? -1 : 1;
-    const r = rnd(0.18, 0.32) * Math.max(W, H);
-    return { side, x: side < 0 ? (anywhere ? rnd(-r, W * 0.5) : -r * 0.6) : (anywhere ? rnd(W * 0.5, W + r) : W + r * 0.6), y: rnd(0.3, 1.0) * H, vx: side * rnd(8, 18) * (W / 1000), r, alpha: rnd(0.16, 0.28), ph: rnd(0, 6.3) };
+    const r = rnd(0.06, 0.13) * Math.max(W, H);
+    const speed = rnd(0.035, 0.07) * W; // crosses its half of the scene in about 8-15 s
+    return {
+      side, r, stretch: rnd(1.6, 2.6), rot: rnd(-0.25, 0.25), spin: rnd(-0.05, 0.05),
+      x: side < 0 ? (anywhere ? rnd(-r, W * 0.45) : -r * 1.2) : (anywhere ? rnd(W * 0.55, W + r) : W + r * 1.2),
+      y: rnd(0.25, 1.05) * H, vx: side * speed, vy: -rnd(2, 10) * (H / 400),
+      alpha: rnd(0.15, 0.27), ph: rnd(0, 6.3), age: anywhere ? rnd(0, 3) : 0,
+    };
   }
   return { x: rnd(0, W), y: rnd(0.1, 0.9) * H, vx: rnd(-10, 10), vy: rnd(-6, 6), r: rnd(1.2, 2.2), alpha: rnd(0.6, 1), wander: rnd(0.6, 1.6), ph: rnd(0, 6.3), ph0: rnd(0, 6.3), blink: rnd(0.5, 1.4) };
 }

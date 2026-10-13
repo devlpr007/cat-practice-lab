@@ -1,0 +1,98 @@
+/* Stage 6e (user request): while the samurai game is ON (body.themed), the ordinary pages — Library,
+   Sectional tests, Feedback, Add PDF, Backup, Settings, test pages, results — wear the same ink,
+   paper and gold look as the Dojo. Rules: the test-taking screen is never themed (body.in-exam has
+   no top bar and its own white layout; nothing here matches inside it), numbers and tables stay
+   readable on paper panels, and no layout or behaviour changes — colours, surfaces and fonts only. */
+
+body.themed:not(.in-exam) { background: var(--t-ink); color: var(--t-paper); }
+body.themed:not(.in-exam)::before { content: ''; position: fixed; inset: 0; z-index: -1; background: url(../assets/theme/home_sky.webp) center / cover no-repeat; filter: brightness(0.42) saturate(0.8); }
+body.themed:not(.in-exam)::after { content: ''; position: fixed; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(10, 12, 28, 0.35) 0%, rgba(10, 12, 28, 0.7) 60%, rgba(10, 12, 28, 0.88) 100%); }
+/* the dojo pages set their own backdrop; keep theirs */
+body.themed.dojo-page::before { background-image: var(--page-backdrop, url(../assets/theme/home_sky.webp)); }
+
+/* headings and text on the dark page */
+body.themed:not(.in-exam) .page > h1, body.themed:not(.in-exam) .page-head h1, body.themed:not(.in-exam) .page > p > a:first-child { color: var(--t-gold); }
+body.themed:not(.in-exam) .page > h1, body.themed:not(.in-exam) .page-head h1 { font-family: var(--font-brush); font-weight: 400; font-size: 2rem; letter-spacing: 0.03em; text-shadow: 0 2px 8px #000; }
+body.themed:not(.in-exam) .page > .muted, body.themed:not(.in-exam) .page > p.muted, body.themed:not(.in-exam) .page > p { color: #d8d2c0; }
+body.themed:not(.in-exam) .page > p a, body.themed:not(.in-exam) .page > .muted a { color: var(--t-gold); }
+
+/* paper panels: cards, boxes, rows, filter bar, forms */
+body.themed:not(.in-exam) .card, body.themed:not(.in-exam) .box, body.themed:not(.in-exam) .test-row, body.themed:not(.in-exam) .filter-bar,
+body.themed:not(.in-exam) .qcard, body.themed:not(.in-exam) .dropzone, body.themed:not(.in-exam) .savebar, body.themed:not(.in-exam) .dialog, body.themed:not(.in-exam) .res-card,
+body.themed:not(.in-exam) .advice-card, body.themed:not(.in-exam) .section-card, body.themed:not(.in-exam) .builder, body.themed:not(.in-exam) .choice, body.themed:not(.in-exam) .topic-check, body.themed:not(.in-exam) .area-group {
+  color: var(--t-paper-text); background: var(--t-paper) url(../assets/theme/texture_washi.webp) center / 512px repeat; border-color: rgba(43, 36, 25, 0.25);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(43, 36, 25, 0.12), inset 0 0 40px rgba(120, 95, 50, 0.12);
+}
+body.themed:not(.in-exam) .card > h2, body.themed:not(.in-exam) .box > h2, body.themed:not(.in-exam) .box > h3, body.themed:not(.in-exam) .card > h3 { font-family: var(--font-brush); font-weight: 400; font-size: 1.3rem; color: #1e1a12; }
+body.themed:not(.in-exam) .card .muted, body.themed:not(.in-exam) .box .muted, body.themed:not(.in-exam) .test-row .muted, body.themed:not(.in-exam) .qcard .muted, body.themed:not(.in-exam) .filter-bar .muted { color: var(--t-paper-muted); }
+body.themed:not(.in-exam) .card a, body.themed:not(.in-exam) .box a, body.themed:not(.in-exam) .test-row a:not(.btn), body.themed:not(.in-exam) .qcard a, body.themed:not(.in-exam) .filter-bar a { color: #7a2328; font-weight: 600; }
+body.themed:not(.in-exam) .box-error { background-color: #f6dcd8; border-color: #c97a72; }
+body.themed:not(.in-exam) .box-warn { background-color: #f4e6c2; border-color: #c9a85a; }
+body.themed:not(.in-exam) .box-ok { background-color: #dceadf; border-color: #7fae8d; }
+body.themed:not(.in-exam) .box-error, body.themed:not(.in-exam) .box-warn, body.themed:not(.in-exam) .box-ok { background-image: none; }
+body.themed:not(.in-exam) .section-card { border: 12px solid transparent; border-image: url(../assets/theme/ui_panel_frame.webp) 236 / 12px / 0 round; border-radius: 0; }
+body.themed:not(.in-exam) .section-card:hover { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(43, 36, 25, 0.12); transform: translateY(-2px); }
+body.themed:not(.in-exam) .section-title { font-family: var(--font-brush); font-weight: 400; font-size: 1.6rem; color: #1e1a12; }
+body.themed:not(.in-exam) .section-count { color: var(--t-crimson); font-family: var(--font-title); }
+body.themed:not(.in-exam) .test-row h2 a { color: #1e1a12; font-family: var(--font-title); text-decoration: none; }
+body.themed:not(.in-exam) .last-result { color: #2e6b3a; }
+body.themed:not(.in-exam) .section-card-own { border-image-source: url(../assets/theme/ui_panel_frame.webp); }
+body.themed:not(.in-exam) .filter-summary { color: #1e1a12; }
+
+/* buttons: lacquer (primary) and paper (secondary) */
+body.themed:not(.in-exam) .btn { background: #fbf7ee; border-color: rgba(43, 36, 25, 0.35); color: #1e1a12; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25); }
+body.themed:not(.in-exam) .btn:hover:not(:disabled) { border-color: var(--t-gold2); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35); }
+body.themed:not(.in-exam) .btn-primary { background: linear-gradient(180deg, #2a2d4e, #15172c); border-color: var(--t-gold2); color: var(--t-gold); }
+body.themed:not(.in-exam) .btn-primary:hover:not(:disabled) { background: linear-gradient(180deg, #343866, #1b1e36); }
+body.themed:not(.in-exam) .btn-danger { background: var(--t-crimson); border-color: #7a1a1f; color: #fff; }
+body.themed:not(.in-exam) .btn-danger-outline { color: #7a2328; border-color: #c97a72; }
+body.themed:not(.in-exam) .btn-selected { background: var(--t-crimson); border-color: #7a1a1f; color: #fff; }
+body.themed:not(.in-exam) .chip { background: #fbf7ee; border-color: rgba(43, 36, 25, 0.35); color: #1e1a12; }
+body.themed:not(.in-exam) .chip.on { background: var(--t-crimson); border-color: #7a1a1f; color: #fff; }
+body.themed:not(.in-exam) .field input, body.themed:not(.in-exam) .field select, body.themed:not(.in-exam) .filter-bar select, body.themed:not(.in-exam) input[type="text"], body.themed:not(.in-exam) input[type="number"], body.themed:not(.in-exam) input[type="date"], body.themed:not(.in-exam) select, body.themed:not(.in-exam) textarea { background: #fff; border-color: rgba(43, 36, 25, 0.35); color: #1e1a12; }
+body.themed:not(.in-exam) .dropzone { border: 2px dashed var(--t-gold2); }
+body.themed:not(.in-exam) .dropzone.over, body.themed:not(.in-exam) .dropzone:hover { background-color: #f8f1df; border-color: var(--t-crimson); }
+body.themed:not(.in-exam) table.report td, body.themed:not(.in-exam) .attempt-list li, body.themed:not(.in-exam) .quest li { border-bottom-color: rgba(43, 36, 25, 0.2); }
+body.themed:not(.in-exam) .tag { background: rgba(43, 36, 25, 0.1); color: var(--t-paper-muted); }
+body.themed:not(.in-exam) .dialog::backdrop { background: rgba(5, 6, 16, 0.7); }
+body.themed:not(.in-exam) .dialog h2 { font-family: var(--font-brush); font-weight: 400; color: #1e1a12; }
+body.themed:not(.in-exam) .update-bar { background: var(--t-paper); border-color: var(--t-gold2); color: var(--t-paper-text); }
+
+/* results and feedback pages: keep their clear tables, on a dark page with paper panels */
+body.themed:not(.in-exam) .res-page { background: transparent; }
+body.themed:not(.in-exam) .res-page, body.themed:not(.in-exam) .feedback { --navy: #1e2140; --rowalt: #f1ead8; }
+body.themed:not(.in-exam) .res-tabs { background: rgba(251, 247, 238, 0.92); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4); }
+body.themed:not(.in-exam) .res-tabs button.on { background: var(--t-crimson); }
+body.themed:not(.in-exam) .res-title, body.themed:not(.in-exam) .res-page .muted.small, body.themed:not(.in-exam) .res-page .btn-plain { color: #e9e2cf; }
+body.themed:not(.in-exam) .res-table, body.themed:not(.in-exam) .res-fold, body.themed:not(.in-exam) .sol-main, body.themed:not(.in-exam) .sol-side, body.themed:not(.in-exam) .q-table, body.themed:not(.in-exam) .res-card {
+  background: var(--t-paper) url(../assets/theme/texture_washi.webp) center / 512px repeat; color: var(--t-paper-text); border-color: rgba(43, 36, 25, 0.25); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4); }
+body.themed:not(.in-exam) .res-table th, body.themed:not(.in-exam) .q-table th { background: #1e2140; color: var(--t-gold); }
+body.themed:not(.in-exam) .res-table tbody tr:nth-child(even) td { background: rgba(43, 36, 25, 0.06); }
+body.themed:not(.in-exam) .res-fold > summary { color: #1e1a12; font-family: var(--font-title); }
+body.themed:not(.in-exam) .res-card-title { color: var(--t-paper-muted); }
+body.themed:not(.in-exam) .res-card-value { color: var(--t-crimson); font-family: var(--font-title); }
+body.themed:not(.in-exam) .feedback .page-head h1 { color: var(--t-gold); }
+body.themed:not(.in-exam) .advice { color: var(--t-paper-text); }
+
+/* Sectional tests builder */
+body.themed:not(.in-exam) .builder h2 { font-family: var(--font-title); color: #1e1a12; }
+body.themed:not(.in-exam) .choice, body.themed:not(.in-exam) .topic-check { box-shadow: none; background-image: none; background-color: rgba(255, 255, 255, 0.6); }
+body.themed:not(.in-exam) .area-group { box-shadow: none; background-image: none; background-color: rgba(255, 255, 255, 0.35); }
+body.themed:not(.in-exam) .weak-list strong { color: var(--t-crimson); }
+
+/* plain-page footer under the theme */
+body.themed:not(.in-exam) .site-footer { border-top-color: rgba(217, 184, 106, 0.3); }
+
+/* results page accents: cyan / blue -> lacquer and crimson; helper text readable on paper */
+body.themed:not(.in-exam) .res-page { --cyan: #1e2140; }
+body.themed:not(.in-exam) .sub-tabs button { background: #f3ead8; color: #4a4030; }
+body.themed:not(.in-exam) .sub-tabs button.on { background: #e9dfc6; color: #7a2328; border-bottom-color: var(--t-crimson); }
+body.themed:not(.in-exam) .sol-title { color: #7a2328; }
+body.themed:not(.in-exam) .sol-opt { background: rgba(255, 255, 255, 0.7); border-color: rgba(43, 36, 25, 0.25); }
+body.themed:not(.in-exam) .sol-opt.chosen { border-color: var(--t-gold2); background: #f8f1df; }
+body.themed:not(.in-exam) .btn-primary-solid { background: linear-gradient(180deg, #2a2d4e, #15172c); color: var(--t-gold); border: 1px solid var(--t-gold2); }
+body.themed:not(.in-exam) .toggle input:checked + .switch { background: var(--t-crimson); }
+body.themed:not(.in-exam) .acc > summary { background: #1e2140; color: var(--t-gold); }
+body.themed:not(.in-exam) .res-wrap .muted, body.themed:not(.in-exam) .res-fold .muted, body.themed:not(.in-exam) .res-card .muted, body.themed:not(.in-exam) .res-fold p.small { color: var(--t-paper-muted); }
+body.themed:not(.in-exam) .res-wrap > .muted.small { color: #d8d2c0; }
+body.themed:not(.in-exam) .time-grid th { background: rgba(43, 36, 25, 0.08); }

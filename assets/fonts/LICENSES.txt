@@ -1,0 +1,13 @@
+Fonts embedded in CAT Practice Lab (game pages only). Latin subsets, downloaded once from
+fonts.gstatic.com on 2026-10-13; the app never loads fonts from the internet.
+
+yuji-syuku-latin.woff2
+  Yuji Syuku, Regular. Copyright 2021 The Yuji Project Authors (Kinuta Font Factory).
+  Licensed under the SIL Open Font License, Version 1.1 — https://openfontlicense.org
+
+shippori-mincho-b1-latin.woff2
+  Shippori Mincho B1, Bold. Copyright 2020 The Shippori Mincho Project Authors (FONTDASU).
+  Licensed under the SIL Open Font License, Version 1.1 — https://openfontlicense.org
+
+The OFL permits free use, embedding and redistribution of these fonts, including in offline
+applications, provided they are not sold on their own.

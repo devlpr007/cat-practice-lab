@@ -1,0 +1,223 @@
+{
+ "rank1_ashigaru": {
+  "file": "icons/rank1_ashigaru.webp",
+  "width": 503,
+  "height": 458,
+  "kb": 38,
+  "sheet": "icons_ranks",
+  "box": [
+   71,
+   548,
+   562,
+   994
+  ]
+ },
+ "rank2_samurai": {
+  "file": "icons/rank2_samurai.webp",
+  "width": 480,
+  "height": 462,
+  "kb": 38,
+  "sheet": "icons_ranks",
+  "box": [
+   617,
+   547,
+   1085,
+   997
+  ]
+ },
+ "rank3_hatamoto": {
+  "file": "icons/rank3_hatamoto.webp",
+  "width": 482,
+  "height": 488,
+  "kb": 51,
+  "sheet": "icons_ranks",
+  "box": [
+   1141,
+   522,
+   1611,
+   998
+  ]
+ },
+ "rank4_daimyo": {
+  "file": "icons/rank4_daimyo.webp",
+  "width": 497,
+  "height": 495,
+  "kb": 60,
+  "sheet": "icons_ranks",
+  "box": [
+   1661,
+   530,
+   2146,
+   1013
+  ]
+ },
+ "rank5_shogun": {
+  "file": "icons/rank5_shogun.webp",
+  "width": 476,
+  "height": 512,
+  "kb": 71,
+  "sheet": "icons_ranks",
+  "box": [
+   2189,
+   487,
+   2678,
+   1014
+  ]
+ },
+ "dojo_blade": {
+  "file": "icons/dojo_blade.webp",
+  "width": 510,
+  "height": 512,
+  "kb": 58,
+  "sheet": "icons_dojos_seal",
+  "box": [
+   71,
+   460,
+   685,
+   1076
+  ]
+ },
+ "dojo_scroll": {
+  "file": "icons/dojo_scroll.webp",
+  "width": 512,
+  "height": 511,
+  "kb": 55,
+  "sheet": "icons_dojos_seal",
+  "box": [
+   740,
+   460,
+   1357,
+   1076
+  ]
+ },
+ "dojo_shadow": {
+  "file": "icons/dojo_shadow.webp",
+  "width": 512,
+  "height": 511,
+  "kb": 46,
+  "sheet": "icons_dojos_seal",
+  "box": [
+   1413,
+   460,
+   2030,
+   1076
+  ]
+ },
+ "seal_red": {
+  "file": "icons/seal_red.webp",
+  "width": 512,
+  "height": 511,
+  "kb": 59,
+  "sheet": "icons_dojos_seal",
+  "box": [
+   2089,
+   464,
+   2697,
+   1071
+  ]
+ },
+ "badge_sakura": {
+  "file": "icons/badge_sakura.webp",
+  "width": 510,
+  "height": 512,
+  "kb": 40,
+  "sheet": "icons_badges",
+  "box": [
+   71,
+   114,
+   671,
+   716
+  ]
+ },
+ "badge_torch": {
+  "file": "icons/badge_torch.webp",
+  "width": 511,
+  "height": 512,
+  "kb": 36,
+  "sheet": "icons_badges",
+  "box": [
+   741,
+   114,
+   1342,
+   716
+  ]
+ },
+ "badge_swords": {
+  "file": "icons/badge_swords.webp",
+  "width": 511,
+  "height": 512,
+  "kb": 39,
+  "sheet": "icons_badges",
+  "box": [
+   1411,
+   114,
+   2012,
+   716
+  ]
+ },
+ "badge_hourglass": {
+  "file": "icons/badge_hourglass.webp",
+  "width": 511,
+  "height": 512,
+  "kb": 40,
+  "sheet": "icons_badges",
+  "box": [
+   2081,
+   114,
+   2682,
+   716
+  ]
+ },
+ "badge_lightning": {
+  "file": "icons/badge_lightning.webp",
+  "width": 511,
+  "height": 512,
+  "kb": 44,
+  "sheet": "icons_badges",
+  "box": [
+   71,
+   820,
+   671,
+   1421
+  ]
+ },
+ "badge_shield": {
+  "file": "icons/badge_shield.webp",
+  "width": 512,
+  "height": 512,
+  "kb": 44,
+  "sheet": "icons_badges",
+  "box": [
+   741,
+   820,
+   1342,
+   1421
+  ]
+ },
+ "badge_scroll": {
+  "file": "icons/badge_scroll.webp",
+  "width": 512,
+  "height": 512,
+  "kb": 41,
+  "sheet": "icons_badges",
+  "box": [
+   1411,
+   820,
+   2012,
+   1421
+  ]
+ },
+ "badge_mountain": {
+  "file": "icons/badge_mountain.webp",
+  "width": 512,
+  "height": 512,
+  "kb": 49,
+  "sheet": "icons_badges",
+  "box": [
+   2081,
+   820,
+   2682,
+   1421
+  ]
+ }
+}

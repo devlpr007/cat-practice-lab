@@ -1,0 +1,311 @@
+{
+ "dojo_blade_header": {
+  "file": "dojo_blade_header.webp",
+  "width": 1920,
+  "height": 1072,
+  "kb": 183,
+  "source": "2752x1536",
+  "star_at": [
+   1753,
+   904
+  ],
+  "notes": [],
+  "alpha": false
+ },
+ "dojo_scroll_header": {
+  "file": "dojo_scroll_header.webp",
+  "width": 1920,
+  "height": 1072,
+  "kb": 175,
+  "source": "2752x1536",
+  "star_at": [
+   1753,
+   904
+  ],
+  "notes": [],
+  "alpha": false
+ },
+ "dojo_shadow_header": {
+  "file": "dojo_shadow_header.webp",
+  "width": 1920,
+  "height": 1072,
+  "kb": 165,
+  "source": "2752x1536",
+  "star_at": [
+   1753,
+   904
+  ],
+  "notes": [],
+  "alpha": false
+ },
+ "home_branch": {
+  "file": "home_branch.webp",
+  "width": 1920,
+  "height": 826,
+  "kb": 229,
+  "source": "2752x1536",
+  "star_at": [
+   1815,
+   936
+  ],
+  "notes": [],
+  "alpha": true
+ },
+ "home_castle": {
+  "file": "home_castle.webp",
+  "width": 1920,
+  "height": 1125,
+  "kb": 298,
+  "source": "2752x1536",
+  "star_at": [
+   1805,
+   947
+  ],
+  "notes": [],
+  "alpha": true
+ },
+ "home_far_mountains": {
+  "file": "home_far_mountains.webp",
+  "width": 1920,
+  "height": 606,
+  "kb": 92,
+  "source": "2752x1536",
+  "star_at": [
+   1753,
+   438
+  ],
+  "notes": [],
+  "alpha": true
+ },
+ "home_sky": {
+  "file": "home_sky.webp",
+  "width": 1920,
+  "height": 1065,
+  "kb": 48,
+  "source": "2752x1536",
+  "star_at": [
+   1789,
+   920
+  ],
+  "notes": [
+   "paper border cropped (59,35,60,41 px)"
+  ],
+  "alpha": false
+ },
+ "boss_final": {
+  "file": "boss_final.webp",
+  "width": 1402,
+  "height": 1400,
+  "kb": 403,
+  "source": "2048x2048",
+  "star_at": [
+   1264,
+   1270
+  ],
+  "notes": [
+   "star reversed on artwork (check)"
+  ],
+  "alpha": true
+ },
+ "boss_weekly": {
+  "file": "boss_weekly.webp",
+  "width": 1658,
+  "height": 1400,
+  "kb": 416,
+  "source": "2048x2048",
+  "star_at": [
+   1485,
+   1360
+  ],
+  "notes": [],
+  "alpha": true
+ },
+ "enemy_blade_oni": {
+  "file": "enemy_blade_oni.webp",
+  "width": 1100,
+  "height": 1400,
+  "kb": 237,
+  "source": "1792x2400",
+  "star_at": [
+   987,
+   1323
+  ],
+  "notes": [
+   "star reversed on artwork (check)"
+  ],
+  "alpha": true
+ },
+ "enemy_scroll_spirit": {
+  "file": "enemy_scroll_spirit.webp",
+  "width": 941,
+  "height": 1400,
+  "kb": 223,
+  "source": "1792x2400",
+  "star_at": [
+   844,
+   1302
+  ],
+  "notes": [],
+  "alpha": true
+ },
+ "enemy_shadow_tengu": {
+  "file": "enemy_shadow_tengu.webp",
+  "width": 1072,
+  "height": 1400,
+  "kb": 211,
+  "source": "1792x2400",
+  "star_at": [
+   955,
+   1329
+  ],
+  "notes": [],
+  "alpha": true
+ },
+ "miniboss_blade": {
+  "file": "miniboss_blade.webp",
+  "width": 1033,
+  "height": 1400,
+  "kb": 261,
+  "source": "1792x2400",
+  "star_at": [
+   918,
+   1300
+  ],
+  "notes": [],
+  "alpha": true
+ },
+ "miniboss_scroll": {
+  "file": "miniboss_scroll.webp",
+  "width": 1009,
+  "height": 1400,
+  "kb": 332,
+  "source": "1792x2400",
+  "star_at": [
+   905,
+   1253
+  ],
+  "notes": [],
+  "alpha": true
+ },
+ "miniboss_shadow": {
+  "file": "miniboss_shadow.webp",
+  "width": 1004,
+  "height": 1400,
+  "kb": 205,
+  "source": "1792x2400",
+  "star_at": [
+   886,
+   1280
+  ],
+  "notes": [],
+  "alpha": true
+ },
+ "samurai_idle": {
+  "file": "samurai_idle.webp",
+  "width": 957,
+  "height": 1400,
+  "kb": 207,
+  "source": "1792x2400",
+  "star_at": [
+   878,
+   1279
+  ],
+  "notes": [],
+  "alpha": true
+ },
+ "samurai_strike": {
+  "file": "samurai_strike.webp",
+  "width": 991,
+  "height": 1400,
+  "kb": 235,
+  "source": "1792x2400",
+  "star_at": [
+   883,
+   1288
+  ],
+  "notes": [],
+  "alpha": true
+ },
+ "texture_ink_splash": {
+  "file": "texture_ink_splash.webp",
+  "width": 1200,
+  "height": 1198,
+  "kb": 327,
+  "source": "2048x2048",
+  "star_at": [
+   1192,
+   1211
+  ],
+  "notes": [],
+  "alpha": true
+ },
+ "texture_washi": {
+  "file": "texture_washi.webp",
+  "width": 1024,
+  "height": 1024,
+  "kb": 18,
+  "source": "2048x2048",
+  "star_at": [
+   904,
+   904
+  ],
+  "notes": [
+   "made seamless"
+  ],
+  "alpha": false
+ },
+ "ui_brush_divider": {
+  "file": "ui_brush_divider.webp",
+  "width": 1600,
+  "height": 88,
+  "kb": 46,
+  "source": "2752x1536",
+  "star_at": [
+   1549,
+   392
+  ],
+  "notes": [],
+  "alpha": true
+ },
+ "ui_panel_frame": {
+  "file": "ui_panel_frame.webp",
+  "width": 1600,
+  "height": 1166,
+  "kb": 151,
+  "source": "2400x1792",
+  "star_at": [
+   1523,
+   1077
+  ],
+  "notes": [
+   "star reversed on artwork (check)"
+  ],
+  "alpha": true
+ },
+ "ui_scroll_banner": {
+  "file": "ui_scroll_banner.webp",
+  "width": 1600,
+  "height": 686,
+  "kb": 102,
+  "source": "2752x1536",
+  "star_at": [
+   1501,
+   668
+  ],
+  "notes": [],
+  "alpha": true
+ },
+ "ui_wood_plaque": {
+  "file": "ui_wood_plaque.webp",
+  "width": 1600,
+  "height": 625,
+  "kb": 150,
+  "source": "2752x1536",
+  "star_at": [
+   1528,
+   659
+  ],
+  "notes": [],
+  "alpha": true
+ }
+}

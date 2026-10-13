@@ -1,0 +1,108 @@
+/* Stage 6: samurai game layer (Dojo pages and the victory banner only — never the test screen).
+   Animations exist only under .effects-on, which is off with "Reduce effects" or when the device
+   asks for reduced motion. */
+.game { --ink: #14152b; --night: #0b1026; --crimson: #b3202a; --gold: #d6b25e; --paper: #fbf7ee; --steel: #c9ced6;
+  max-width: 1200px; margin: 0 auto; padding: 0 16px 48px; color: #1f2430; }
+.game h1, .game h2, .game h3 { font-family: Georgia, 'Times New Roman', serif; letter-spacing: 0.01em; }
+.game h2 { font-size: 1.15rem; margin: 0 0 10px; }
+
+/* castle hero */
+.castle-hero { position: relative; margin: 16px 0; border-radius: 14px; overflow: hidden; min-height: 260px; background: var(--night); color: #f5ecd7; --px: 0; --py: 0; }
+.castle-scene { display: block; width: 100%; height: 300px; }
+.effects-on .castle-scene .layer { transition: transform 0.3s ease-out; }
+.effects-on .castle-scene .layer-sky { transform: translate(calc(var(--px) * -6px), calc(var(--py) * -4px)); }
+.effects-on .castle-scene .layer-far { transform: translate(calc(var(--px) * -12px), calc(var(--py) * -6px)); }
+.effects-on .castle-scene .layer-mid { transform: translate(calc(var(--px) * -20px), calc(var(--py) * -8px)); }
+.effects-on .castle-scene .layer-near { transform: translate(calc(var(--px) * -32px), calc(var(--py) * -10px)); }
+.hero-text { position: absolute; left: 24px; top: 20px; max-width: min(380px, 70%); background: rgba(11, 16, 38, 0.55); padding: 14px 18px; border-radius: 10px; backdrop-filter: blur(2px); }
+.hero-kicker { margin: 0; text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.75rem; opacity: 0.8; }
+.hero-text h1 { margin: 2px 0; font-size: 2.1rem; color: var(--gold); }
+.hero-power { margin: 0 0 8px; font-size: 1.1rem; }
+.g-bar { height: 10px; background: rgba(255, 255, 255, 0.18); border-radius: 6px; overflow: hidden; }
+.g-bar-fill { height: 100%; background: linear-gradient(90deg, var(--crimson), var(--gold)); border-radius: 6px; }
+.rank-bar { margin: 4px 0 6px; }
+
+/* petals (tap one and it flutters away) */
+.petals { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.petal { position: absolute; top: -20px; width: 14px; height: 10px; padding: 0; border: 0; border-radius: 70% 0 70% 0; background: #f7b6c8; opacity: 0.85; pointer-events: auto; cursor: pointer;
+  animation: drift linear infinite; }
+.petal.flutter { animation: flutter 0.9s ease-out forwards; }
+@keyframes drift { 0% { transform: translate(0, -20px) rotate(0deg); } 50% { transform: translate(40px, 160px) rotate(160deg); } 100% { transform: translate(-20px, 340px) rotate(340deg); } }
+@keyframes flutter { to { transform: translate(80px, -60px) rotate(720deg) scale(0.2); opacity: 0; } }
+
+/* gates */
+.gates { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 16px 0; }
+.gate { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px; padding: 18px 14px; border-radius: 14px; text-decoration: none; color: #fff; border: 2px solid transparent; }
+.gate:hover, .gate:focus-visible { border-color: var(--gold); }
+.effects-on .gate { transition: transform 0.15s; }
+.effects-on .gate:hover { transform: translateY(-3px); }
+.gate .emblem { width: 76px; height: 76px; }
+.gate-name { font-family: Georgia, serif; font-size: 1.25rem; font-weight: 700; }
+.gate-way { font-size: 0.85rem; opacity: 0.8; }
+.gate-power strong { font-size: 1.6rem; }
+.gate-stats { opacity: 0.85; }
+.gate-quant { background: linear-gradient(160deg, #2b2f36, #121316); }
+.gate-varc { background: linear-gradient(160deg, #6f6146, #2f2a1f); }
+.gate-lrdi { background: linear-gradient(160deg, #24363d, #0f181c); }
+
+/* cards and grids */
+.g-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 14px 0; }
+.g-grid.two { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.g-card { background: var(--paper); border: 1px solid #e3d8bd; border-radius: 12px; padding: 14px 16px; }
+.g-card .boss { width: 56px; height: 56px; float: right; margin-left: 8px; }
+.quest { list-style: none; padding: 0; margin: 0 0 6px; }
+.quest li { padding: 4px 0; }
+.quest li.done { color: #2e7d4f; font-weight: 600; }
+.sakura-tree { display: block; width: 100%; max-width: 280px; margin: 0 auto; }
+.countdown strong { font-size: 2rem; color: var(--crimson); }
+.big { font-size: 2.2rem; font-weight: 700; margin: 0; color: var(--crimson); }
+.radar { display: block; width: 100%; max-width: 320px; margin: 0 auto; }
+.radar-label { font: 600 12px Georgia, serif; fill: #3a2f1f; }
+.radar-value { font: 11px system-ui, sans-serif; fill: #6b5a3a; }
+.heatmap { display: block; width: 100%; max-width: 420px; }
+.hm { fill: #ece3cc; }
+.hm-1 { fill: #f7c9d6; } .hm-2 { fill: #f09ab3; } .hm-3 { fill: #d9547a; } .hm-4 { fill: #a4183f; }
+.g-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+.g-table th { text-align: left; border-bottom: 2px solid #d9cba6; padding: 6px; }
+.g-table td { border-bottom: 1px solid #eadfc4; padding: 6px; }
+.g-table td.slow { color: var(--crimson); font-weight: 600; }
+.honour, .unlocks, .scrolls, .battles { list-style: none; padding: 0; margin: 0 0 8px; }
+.honour li, .unlocks li, .scrolls li, .battles li { padding: 5px 0; border-bottom: 1px dashed #e3d8bd; }
+.unlocks li.locked { opacity: 0.6; }
+.scrolls li.cleared { opacity: 0.6; }
+.grade { display: inline-block; min-width: 24px; text-align: center; padding: 1px 6px; border-radius: 4px; font-weight: 700; font-family: Georgia, serif; background: #ddd; }
+.grade-S { background: var(--gold); color: #3a2a00; }
+.grade-A { background: #2e7d4f; color: #fff; }
+.grade-B { background: #6b7280; color: #fff; }
+.how { margin-top: 14px; }
+
+/* a dojo */
+.dojo-head { position: relative; margin: 16px 0 8px; border-radius: 14px; overflow: hidden; }
+.dojo-banner { display: block; width: 100%; height: 170px; }
+.dojo-title { position: absolute; left: 20px; bottom: 14px; display: flex; align-items: center; gap: 12px; background: rgba(0, 0, 0, 0.45); color: #fff; padding: 8px 14px; border-radius: 10px; }
+.dojo-varc .dojo-title { background: rgba(40, 32, 20, 0.6); }
+.dojo-title .emblem { width: 54px; height: 54px; }
+.dojo-title h1 { margin: 0; font-size: 1.6rem; }
+.effects-on .sparks circle { animation: spark 1.6s ease-in infinite; }
+.effects-on .sparks circle:nth-child(2n) { animation-delay: -0.8s; }
+@keyframes spark { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-30px); opacity: 0; } }
+.skill-tree { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+.branch h3 { margin: 0 0 8px; border-bottom: 2px solid var(--gold); padding-bottom: 4px; }
+.node { display: flex; gap: 10px; align-items: flex-start; padding: 8px; margin-bottom: 8px; border-radius: 10px; background: #fff; border: 1px solid #eadfc4; }
+.node .boss { width: 44px; height: 44px; flex: none; }
+.node-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
+.node-mastered { border-color: #9fd3b1; background: #f1fbf4; }
+.node-returned { border-color: #c39bd3; background: #f8f1fb; }
+.node-locked { opacity: 0.7; }
+.hp { display: flex; align-items: center; gap: 6px; }
+.hp .g-bar { flex: 1; background: #eee; }
+.hp-bar .g-bar-fill { background: linear-gradient(90deg, #c0392b, #e67e22); }
+
+@media (max-width: 600px) {
+  .castle-scene { height: 240px; }
+  .hero-text { left: 12px; top: 12px; right: 12px; max-width: none; }
+  .hero-text h1 { font-size: 1.6rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .petal, .sparks circle { animation: none !important; }
+}

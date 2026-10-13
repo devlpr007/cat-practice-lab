@@ -19,6 +19,8 @@ import {
 export const SYNC_FORMAT = 'cat-practice-lab-sync';
 export const SYNC_VERSION = 1;
 const STATE = 'sync.files';
+/** PDFs downloaded at the same time during a sync. */
+const PARALLEL = 4;
 const enc = new TextEncoder();
 const dec = new TextDecoder();
 
@@ -67,6 +69,8 @@ export async function syncOnce({ drive, store, now = Date.now(), onProgress = ()
   const remote = new Map();
   for (const f of remoteList) { if (!remote.has(f.name)) remote.set(f.name, []); remote.get(f.name).push(f); }
   const state = { ...(await store.getSetting(STATE, {})) };
+  // what an interrupted sync may remember: only files whose content is really saved on this device
+  const committed = { ...state };
   const changedRemote = (name) => (remote.get(name) || []).some((f) => !state[name] || state[name].id !== f.id || state[name].version !== f.version) || (remote.get(name) || []).length > 1;
   const readJson = async (f) => {
     const b = await drive.download(f.id); out.bytesDown += b.size; out.downloaded++;
@@ -113,27 +117,51 @@ export async function syncOnce({ drive, store, now = Date.now(), onProgress = ()
   }
   const sources = new Map(localSources);
   const attempts = new Map(localAttempts);
-  const newImages = [];
   const names = [...remote.keys()];
   const srcNames = names.filter((n) => /^src-.+\.json$/.test(n) && changedRemote(n));
   const attNames = names.filter((n) => /^att-.+\.json$/.test(n) && changedRemote(n));
   let k = 0;
-  for (const name of srcNames) {
-    onProgress(`Reading your PDFs (${++k} of ${srcNames.length})`);
-    const id = name.slice(4, -5);
-    if (skipSources.has(id)) continue;
-    for (const d of await readAll(name)) {
-      const m = mergeSourceBundle(sources.get(id), { source: d.source, questions: d.questions });
-      sources.set(id, m.bundle); replaced.push(...m.replaced);
+  // PDFs are read a few at a time and each one is saved on this device as soon as it is complete,
+  // so a long first sync (hundreds of MB of pictures) keeps its progress if it is interrupted and
+  // never holds everything in memory at once.
+  const savedEarly = new Set();
+  const pending = srcNames.filter((n) => !skipSources.has(n.slice(4, -5)));
+  for (let i = 0; i < pending.length; i += PARALLEL) {
+    const chunk = pending.slice(i, i + PARALLEL);
+    onProgress(`Reading your PDFs (${Math.min(i + chunk.length, pending.length)} of ${pending.length})`);
+    const results = await Promise.all(chunk.map(async (name) => {
+      const id = name.slice(4, -5);
+      const docs = await readAll(name);
+      let images = null;
+      if (!localSources.has(id)) {
+        const img = (remote.get(`img-${id}.bin`) || [])[0];
+        if (!img) return { id, name, docs, missingPictures: true };
+        const b = await drive.download(img.id); out.bytesDown += b.size; out.downloaded++;
+        images = { list: await unpackImages(b), file: img };
+      }
+      return { id, name, docs, images };
+    }));
+    const put = { sources: [], questions: [] };
+    const imgs = [];
+    for (const r of results) {
+      if (r.missingPictures) { out.waiting = (out.waiting || 0) + 1; delete state[r.name]; continue; }
+      for (const d of r.docs) {
+        const m = mergeSourceBundle(sources.get(r.id), { source: d.source, questions: d.questions });
+        sources.set(r.id, m.bundle); replaced.push(...m.replaced);
+      }
+      const b = sources.get(r.id);
+      put.sources.push(b.source); put.questions.push(...b.questions);
+      if (r.images) { imgs.push(...r.images.list); state[`img-${r.id}.bin`] = { id: r.images.file.id, version: r.images.file.version, hash: 'pictures' }; }
+      savedEarly.add(r.id);
+      for (const n of [r.name, `img-${r.id}.bin`]) if (state[n]) committed[n] = state[n];
     }
-    if (!localSources.has(id)) {
-      const img = (remote.get(`img-${id}.bin`) || [])[0];
-      if (!img) throw new Error('A PDF in your Drive has no pictures yet (another device may still be uploading it). Try again in a minute.');
-      const b = await drive.download(img.id); out.bytesDown += b.size; out.downloaded++;
-      newImages.push(...await unpackImages(b));
-      state[`img-${id}.bin`] = { id: img.id, version: img.version, hash: 'pictures' };
+    if (put.sources.length) {
+      await store.apply(put, imgs);
+      await store.setSetting(STATE, committed); // progress survives an interruption
     }
   }
+  // a PDF whose pictures are not in Drive yet (another device still uploading) is left for next time
+  for (const id of [...sources.keys()]) if (!localSources.has(id) && !savedEarly.has(id)) sources.delete(id);
   k = 0;
   for (const name of attNames) {
     onProgress(`Reading your attempts (${++k} of ${attNames.length})`);
@@ -151,12 +179,12 @@ export async function syncOnce({ drive, store, now = Date.now(), onProgress = ()
   const was = (list) => new Map(list.map((r) => [r.id ?? r.key, stable(r)]));
   const before = { sources: was(local.sources), questions: was(local.questions), tests: was(local.tests), attempts: was(local.attempts), questionAttempts: was(local.questionAttempts), settings: was(local.settings) };
   const add = (s, r) => { if (before[s].get(r.id ?? r.key) !== stable(r)) put[s].push(r); };
-  for (const b of sources.values()) { add('sources', b.source); for (const q of b.questions) add('questions', q); }
+  for (const [id, b] of sources) { if (savedEarly.has(id)) continue; add('sources', b.source); for (const q of b.questions) add('questions', q); }
   for (const t of tests) add('tests', t);
   for (const b of attempts.values()) { add('attempts', b.attempt); for (const r of b.records) add('questionAttempts', r); }
   for (const r of settings) add('settings', r);
-  const changedLocally = Object.values(put).some((l) => l.length) || newImages.length;
-  if (changedLocally) { onProgress('Saving on this device'); await store.apply(put, newImages); }
+  const changedLocally = Object.values(put).some((l) => l.length);
+  if (changedLocally) { onProgress('Saving on this device'); await store.apply(put, []); }
 
   // ---- upload what Drive does not have yet ----
   const files = [];

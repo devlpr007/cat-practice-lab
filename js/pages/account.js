@@ -122,7 +122,7 @@ export async function render(root) {
     if (btn) btn.disabled = true;
     try {
       const r = await syncNow({ interactive: true, onProgress: (t) => say('muted', `${t}…`) });
-      say('ok', `Synced. ${r.uploaded} file(s) sent, ${r.downloaded} received.` + (r.replaced ? ` ${r.replaced} change(s) from another device were newer.` : ''));
+      say('ok', `Synced. ${r.uploaded} file(s) sent, ${r.downloaded} received.` + (r.replaced ? ` ${r.replaced} change(s) from another device were newer.` : '') + (r.waiting ? ` ${r.waiting} PDF(s) are still being uploaded by your other device; they arrive at the next sync.` : ''));
     } catch (e) {
       say('error', e.message);
     }

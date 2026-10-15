@@ -158,3 +158,68 @@ body.fx-on .hall-badge.unlocked .hall-icon { animation: badge-glow 3.2s ease-in-
   :is(.rank-emblem, .gate .medal, .dojo-medal, .hall-icon) { animation: none !important; }
   :is(.section-card, .test-row, .res-card, .best, .hall-badge, .cal-stat)::after { animation: none !important; }
 }
+
+/* ---------- more animations (user, 2026-10-15): only with effects on, never on the test screen ---------- */
+/* page titles are written in with a brush, a gold stroke drawn under them */
+body.fx-on:not(.in-exam) :is(.page > h1, .page-head h1, h1.t-title) { animation: title-ink 0.9s cubic-bezier(.2, .8, .2, 1) both; position: relative; }
+body.fx-on:not(.in-exam) :is(.page > h1, .page-head h1, h1.t-title)::after { content: ''; position: absolute; left: 0; bottom: -6px; width: min(220px, 100%); height: 3px; border-radius: 3px;
+  background: linear-gradient(90deg, #d9b86a, rgba(217, 184, 106, 0)); transform-origin: left; animation: title-stroke 0.8s 0.45s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes title-ink { from { clip-path: inset(0 100% 0 0); filter: blur(2px); } to { clip-path: inset(0 -10% -20% 0); filter: none; } }
+@keyframes title-stroke { from { transform: scaleX(0); opacity: 0; } to { transform: scaleX(1); opacity: 1; } }
+
+/* bars grow from zero when they come into view */
+body.fx-on .fx-wait:is(.speed-fill, .g-bar-fill, .mb-fill), body.fx-on .mt-track > .fx-wait { transform: scaleX(0); transform-origin: left; }
+body.fx-on .fx-play:is(.speed-fill, .g-bar-fill, .mb-fill), body.fx-on .mt-track > .fx-play { transform-origin: left; animation: bar-grow 1.1s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes bar-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* charts: lines draw themselves, dots pop in after, the radar grows from the centre, the calendar fills in */
+body.fx-on svg.fx-wait :is(polyline.series, polyline.ml, .dot, .md, .radar-shape, .radar-dot, rect.hm) { opacity: 0; }
+body.fx-on svg.fx-play :is(polyline.series, polyline.ml) { stroke-dasharray: var(--len, 1200); animation: line-draw 1.4s cubic-bezier(.4, 0, .2, 1) both; }
+body.fx-on svg.fx-play :is(.dot, .md) { transform-box: fill-box; transform-origin: center; animation: dot-pop 0.4s 1.1s cubic-bezier(.3, 1.6, .5, 1) both; }
+body.fx-on svg.fx-play .radar-shape { transform-box: view-box; transform-origin: 150px 135px; animation: radar-grow 1s cubic-bezier(.2, .8, .2, 1) both; }
+body.fx-on svg.fx-play .radar-dot { transform-box: fill-box; transform-origin: center; animation: dot-pop 0.4s 0.8s cubic-bezier(.3, 1.6, .5, 1) both; }
+body.fx-on svg.fx-play rect.hm { transform-box: fill-box; transform-origin: center; animation: dot-pop 0.35s var(--d, 0ms) ease-out both; }
+@keyframes line-draw { from { stroke-dashoffset: var(--len, 1200); } to { stroke-dashoffset: 0; } }
+@keyframes dot-pop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes radar-grow { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* table rows slide in one after another */
+body.fx-on table.fx-wait tbody tr { opacity: 0; }
+body.fx-on table.fx-play tbody tr { animation: row-in 0.45s calc(var(--i, 0) * 45ms) cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes row-in { from { opacity: 0; transform: translateX(-14px); } to { opacity: 1; transform: none; } }
+
+/* the selected tab / filter pops with a gold ring */
+body.fx-on:not(.in-exam) :is(.chip.on, .res-tabs button.on, .sub-tabs button.on) { animation: pick-pop 0.45s cubic-bezier(.3, 1.5, .5, 1); }
+@keyframes pick-pop { 0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(217, 184, 106, 0.7); } 60% { transform: scale(1.05); } 100% { transform: scale(1); box-shadow: 0 0 0 10px rgba(217, 184, 106, 0); } }
+
+/* an ink drop spreads where you click or tap */
+.ink-drop { position: fixed; z-index: 60; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(217, 184, 106, 0.55) 0%, rgba(217, 184, 106, 0.25) 45%, rgba(217, 184, 106, 0) 70%);
+  box-shadow: 0 0 0 1px rgba(217, 184, 106, 0.5); animation: ink-drop 0.65s cubic-bezier(.2, .8, .2, 1) forwards; }
+@keyframes ink-drop { from { transform: scale(0.3); opacity: 1; } to { transform: scale(5.5); opacity: 0; } }
+
+/* a soft light follows the mouse over cards */
+body.fx-on.themed .fx-glow:is(.section-card, .test-row, .res-card) {
+  background-image: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 236, 190, 0.32), rgba(255, 236, 190, 0) 65%), url(../assets/theme/texture_washi.webp);
+  background-size: 100% 100%, 512px; background-repeat: no-repeat, repeat; background-position: 0 0, center; }
+
+/* dialogs open like a scroll unrolling */
+body.fx-on:not(.in-exam) dialog.dialog[open]:not(.picture-dialog) { animation: dialog-unroll 0.42s cubic-bezier(.2, .8, .2, 1); transform-origin: top center; }
+@keyframes dialog-unroll { from { opacity: 0; transform: scaleY(0.15) translateY(-20px); clip-path: inset(0 0 85% 0); } to { opacity: 1; transform: none; clip-path: inset(0 0 0 0); } }
+
+/* gold reading line at the top of the page */
+.scroll-line { position: fixed; left: 0; right: 0; top: 0; height: 3px; z-index: 50; pointer-events: none; transform: scaleX(0); transform-origin: left;
+  background: linear-gradient(90deg, #8a6a1f, #d9b86a, #fff1c9); box-shadow: 0 0 8px rgba(217, 184, 106, 0.8); transition: transform 0.12s linear; }
+body.in-exam .scroll-line, body:not(.fx-on) .scroll-line, body.in-exam .ink-drop { display: none; }
+
+/* embers behind the pages (the backdrop moves one layer further back to make room) */
+.embers { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+body.fx-on.themed:not(.in-exam)::before { z-index: -3; }
+body.fx-on.themed:not(.in-exam)::after { z-index: -2; }
+body.in-exam .embers, body:not(.themed) .embers { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  body.fx-on :is(.page > h1, .page-head h1, h1.t-title), body.fx-on :is(.page > h1, .page-head h1, h1.t-title)::after, .fx-play, .fx-play *, .ink-drop, .chip.on, .res-tabs button.on, .sub-tabs button.on, dialog.dialog[open] { animation: none !important; }
+  .fx-wait, .fx-wait * { opacity: 1 !important; transform: none !important; }
+  .ink-drop, .scroll-line, .embers { display: none !important; }
+}

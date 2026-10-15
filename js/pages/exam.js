@@ -10,7 +10,7 @@ import {
 } from '../db.js';
 import {
   createAttempt, openQuestion, setAnswer, toggleMark, tick, resumeClock, statusOf, counts,
-  timerText, isTimeUp, finish, questionAttemptRecords, checkQuestion, setNote, STATUS,
+  timerText, totalTimeText, clockStopped, isTimeUp, finish, questionAttemptRecords, checkQuestion, setNote, STATUS,
   currentSection, openRange, nextSection, syncSections, sectionCounts, isSectionTimeUp,
 } from '../exam/engine.js';
 import { isCorrect } from '../exam/scoring.js';
@@ -94,13 +94,13 @@ export async function render(root, params) {
     const dir = await getSetting('timerDirection', 'down');
     const m = test.settings.marking;
     const dirSel = h('select', { id: 'timer-direction' },
-      h('option', { value: 'down', selected: dir === 'down' }, 'Count down (time left)'),
-      h('option', { value: 'up', selected: dir === 'up' }, 'Count up (time used)'));
+      h('option', { value: 'down', selected: dir === 'down' }, 'Exam mode'),
+      h('option', { value: 'up', selected: dir === 'up' }, 'Practice mode'));
     const modeNote = h('p', { class: 'box small', id: 'mode-note' });
     const explain = () => {
       modeNote.textContent = dirSel.value === 'up'
-        ? 'Practice mode: each question has a "Submit question" button. Pressing it locks your answer, shows the solution and colours the question green (correct) or red (wrong).'
-        : 'Exam mode: like the real exam. Solutions and correct / wrong colours are shown only after you submit the whole test.';
+        ? 'Practice mode: each question has its own clock counting up. It runs while you are on that question and stops when you press "Submit question", which locks your answer, shows the solution and colours the question green (correct) or red (wrong). If you leave a question without submitting it, its clock carries on when you come back to it.'
+        : 'Exam mode: like the real exam. The clock counts down the time left for the whole test. Solutions and correct / wrong colours are shown only after you submit the whole test.';
     };
     dirSel.addEventListener('change', explain);
     explain();
@@ -114,7 +114,7 @@ export async function render(root, params) {
           h('li', null, 'Your answer is kept as soon as you choose it. "Next" moves to the next question.'),
           h('li', null, 'The bookmark marks a question for review. Marked questions are still scored.'),
           h('li', null, 'The timer keeps running if you refresh, lock the phone or leave the page; you can come back and continue.')),
-        h('label', { class: 'field' }, h('span', null, 'Timer'), dirSel),
+        h('label', { class: 'field' }, h('span', null, 'Mode'), dirSel),
         modeNote,
         h('button', { class: 'btn btn-primary', type: 'button', id: 'start-test', onClick: async () => {
           const now = Date.now();
@@ -147,10 +147,15 @@ export async function render(root, params) {
     let sideCollapsed = false;
     let phoneTab = 'question';
 
+    const practice = attempt.mode === 'practice';
     const timerEl = h('span', { class: 'timer-text', id: 'timer' });
+    const timerLabel = practice ? h('span', { class: 'timer-label', id: 'timer-label' }) : null;
+    const totalEl = practice ? h('span', { class: 'timer-total', id: 'timer-total' }) : null;
     const top = h('header', { class: 'exam-top' },
       h('button', { class: 'btn-plain back', type: 'button', id: 'exam-back', onClick: leave }, icon('back'), 'Back'),
-      h('div', { class: 'timer' }, icon('clock'), timerEl),
+      practice
+        ? h('div', { class: 'timer practice-timer' }, h('div', { class: 'timer-main' }, icon('clock'), timerLabel, timerEl), totalEl)
+        : h('div', { class: 'timer' }, icon('clock'), timerEl),
       h('div', { class: 'top-right' },
         h('button', { class: 'btn-plain palette-toggle', type: 'button', id: 'palette-toggle', 'aria-label': 'Show questions', onClick: () => { drawerOpen = !drawerOpen; draw(); } }, icon('grid')),
         h('button', { class: 'btn-outline', type: 'button', id: 'submit-test', onClick: askSubmit }, isMock ? 'Submit section' : 'Submit')));
@@ -214,9 +219,14 @@ export async function render(root, params) {
               },
             }, icon('bookmark')),
             noteOpen ? noteBox(a) : null),
-          h('button', { class: 'icon-btn', type: 'button', id: 'open-calc', title: 'Calculator', onClick: () => { calc = calc || newCalc(); calcBox.hidden = false; drawCalc(); } }, icon('calc'))),
+          h('button', { class: 'icon-btn', type: 'button', id: 'open-calc', title: 'Calculator', onClick: () => { calc = calc || newCalc(); calcBox.hidden = false; drawCalc(); } }, icon('calc'))));
+      // question on the left, answer on the right when the screen is wide enough; otherwise the
+      // answer simply wraps below the question (phones, wide pictures)
+      const qCol = h('div', { class: 'q-col' },
         passageAbove ? h('div', { class: 'passage-above', id: 'passage' }, h('div', { class: 'set-title' }, setLabel(attempt.current) || ''), imgEl(pic(p.passage), 'Passage', 0.6)) : null,
         h('div', { class: 'q-body' }, stemEl(q, pic(p.question))));
+      const aCol = h('div', { class: 'a-col' });
+      pane.append(h('div', { class: 'qa' }, qCol, aCol));
       const locked = !!a.checked;
       if (q.type === 'MCQ') {
         const letters = ['A', 'B', 'C', 'D'];
@@ -231,14 +241,14 @@ export async function render(root, params) {
             onClick: () => { setAnswer(attempt, L, Date.now()); changed(); save(); },
           }, h('span', { class: 'opt-n' }, String(i + 1)), h('span', { class: 'opt-body' }, content), h('span', { class: 'radio' + (chosen ? ' on' : '') }));
         });
-        pane.append(h('div', { class: 'options', role: 'radiogroup' }, rows));
+        aCol.append(h('div', { class: 'options', role: 'radiogroup' }, rows));
       } else {
-        pane.append(titaBox(a, locked));
+        aCol.append(titaBox(a, locked));
       }
-      if (!locked) pane.append(h('button', { class: 'link-btn', type: 'button', id: 'clear-response', onClick: () => { setAnswer(attempt, null, Date.now()); changed(); save(); } }, 'Clear response'));
+      if (!locked) aCol.append(h('button', { class: 'link-btn', type: 'button', id: 'clear-response', onClick: () => { setAnswer(attempt, null, Date.now()); changed(); save(); } }, 'Clear response'));
       if (attempt.mode === 'practice') {
         if (!locked) {
-          pane.append(h('div', { class: 'practice-row' }, h('button', {
+          aCol.append(h('div', { class: 'practice-row' }, h('button', {
             class: 'btn-outline', type: 'button', id: 'submit-question', disabled: a.answer === null,
             title: a.answer === null ? 'Choose or type an answer first' : 'Check this answer and see the solution',
             onClick: async () => {
@@ -250,7 +260,7 @@ export async function render(root, params) {
           }, 'Submit question')));
         } else {
           const keyText = q.type === 'MCQ' ? `option ${'ABCD'.indexOf(q.answer) + 1}` : q.answer;
-          pane.append(h('div', { class: `result ${a.checked.correct ? 'ok' : 'bad'}`, id: 'result', role: 'status' },
+          aCol.append(h('div', { class: `result ${a.checked.correct ? 'ok' : 'bad'}`, id: 'result', role: 'status' },
             a.checked.correct ? 'Correct' : `Incorrect — the correct answer is ${keyText}`));
           pane.append(h('div', { class: 'solution', id: 'solution' }, h('h3', null, 'Solution'), imgEl(pic(p.solution), `Solution ${attempt.current + 1}`)));
         }
@@ -426,6 +436,13 @@ export async function render(root, params) {
     function updateTimer() {
       const now = Date.now();
       timerEl.textContent = timerText(attempt, now);
+      if (practice) {
+        // practice mode: the big clock is this question's own; the whole test's time is shown small
+        const stopped = clockStopped(attempt, attempt.questions[attempt.current]);
+        timerLabel.textContent = stopped ? `Q${attempt.current + 1} took` : `Q${attempt.current + 1}`;
+        timerEl.parentElement.classList.toggle('stopped', stopped);
+        totalEl.textContent = `Total ${totalTimeText(attempt, now)} of ${test.settings.timeLimitMin} min`;
+      }
       if (attempt.status !== 'in-progress') return;
       if (isMock) {
         if (isSectionTimeUp(attempt, now)) advanceSection(true);

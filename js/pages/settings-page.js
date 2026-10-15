@@ -47,8 +47,8 @@ export async function render(root) {
   showPersist(st.persisted);
   const dir = await getSetting('timerDirection', 'down');
   const dirSel = h('select', { id: 'def-timer-direction' },
-    h('option', { value: 'down', selected: dir === 'down' }, 'Count down (time left)'),
-    h('option', { value: 'up', selected: dir === 'up' }, 'Count up (time used)'));
+    h('option', { value: 'down', selected: dir === 'down' }, 'Exam mode'),
+    h('option', { value: 'up', selected: dir === 'up' }, 'Practice mode'));
   const dirMsg = h('p', { role: 'status', class: 'small' });
   dirSel.addEventListener('change', async () => { await setSetting('timerDirection', dirSel.value); dirMsg.className = 'ok small'; dirMsg.textContent = 'Saved.'; });
   const demoMsg = h('p', { role: 'status', class: 'small' });
@@ -68,7 +68,7 @@ export async function render(root) {
     h('h1', null, 'Settings'),
     h('section', { class: 'card' },
       h('h2', null, 'Test timer'),
-      h('label', { class: 'field' }, h('span', null, 'The timer during a test'), dirSel),
+      h('label', { class: 'field' }, h('span', null, 'Default mode for a test (Exam mode = time left counts down; Practice mode = each question has its own clock)'), dirSel),
       h('p', { class: 'muted small' }, 'You can also change this on the start screen of each test. The test always ends at its time limit.'),
       dirMsg),
     h('section', { class: 'card', id: 'game-settings' },

@@ -18,7 +18,9 @@ export const STATUS = {
 /**
  * A new attempt. sections: [{ id, name, style, questionIds }] (copied from the test).
  * Count-up timer = practice mode: each question can be submitted on its own to see the solution
- * and whether it was right. Count-down timer = exam mode: nothing is revealed before the end.
+ * and whether it was right, and each question has its own clock (it runs while that question is on
+ * screen and stops for good once it is submitted). Count-down timer = exam mode: nothing is
+ * revealed before the end.
  */
 export function createAttempt({ id, test, now, timerDirection = 'down' }) {
   const isMock = test.kind === 'mock';
@@ -124,13 +126,24 @@ export function sectionCounts(state, index = state.mock ? state.mock.sectionInde
   return counts(sub);
 }
 
+/** A question's own clock has stopped (practice mode: after "Submit question"). */
+export const clockStopped = (state, q) => state.mode === 'practice' && !!q.checked;
+
 /** Add the time since the last tick to the question on screen (only if the page was visible). */
 export function tick(state, now, visible = true) {
   if (state.status !== 'in-progress') return state;
   const until = Math.min(now, currentEndsAt(state));
-  if (visible && until > state.lastTick) state.questions[state.current].timeSpentMs += until - state.lastTick;
+  const q = state.questions[state.current];
+  if (visible && until > state.lastTick && !clockStopped(state, q)) q.timeSpentMs += until - state.lastTick;
   state.lastTick = now;
   return state;
+}
+
+/** Time on the question on screen up to `now` (its saved time plus the part not yet ticked). */
+export function questionTimeMs(state, now) {
+  const q = state.questions[state.current];
+  if (state.status !== 'in-progress' || clockStopped(state, q)) return q.timeSpentMs;
+  return q.timeSpentMs + Math.max(0, Math.min(now, currentEndsAt(state)) - state.lastTick);
 }
 
 /** Called when the page becomes visible again: time while hidden is not counted per question. */
@@ -195,6 +208,7 @@ export function checkQuestion(state, now, correct) {
   if (state.status !== 'in-progress' || state.mode !== 'practice') return state;
   const q = state.questions[state.current];
   if (q.answer === null || q.checked) return state;
+  tick(state, now); // the question's clock stops here
   q.checked = { at: now - state.startedAt, correct: !!correct };
   return state;
 }
@@ -228,9 +242,17 @@ export const isTimeUp = (state, now) => now >= state.endsAt;
 /** Mock: the current section's time is up (the test as a whole may still be running). */
 export const isSectionTimeUp = (state, now) => !!state.mock && now >= currentSection(state).endsAt;
 
-/** What the timer shows: counting down (default) or up. */
+/**
+ * What the timer shows. Exam mode (count down): the time left. Practice mode (count up): the time
+ * on the question on screen (each question has its own clock).
+ */
 export function timerText(state, now) {
-  const ms = state.timerDirection === 'up' ? elapsedMs(state, now) : remainingMs(state, now);
+  return clockText(state.timerDirection === 'up' ? questionTimeMs(state, now) : remainingMs(state, now));
+}
+/** Practice mode: the whole test's time used so far. */
+export const totalTimeText = (state, now) => clockText(elapsedMs(state, now));
+
+export function clockText(ms) {
   const total = Math.floor(ms / 1000);
   const hh = String(Math.floor(total / 3600)).padStart(2, '0');
   const mm = String(Math.floor((total % 3600) / 60)).padStart(2, '0');
